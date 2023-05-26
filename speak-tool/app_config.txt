@@ -18,7 +18,7 @@ consent_template = 'image_caption_task/consent.html'
 # where to save all turk worker data
 # (file structure of saved recordings mimics the file structure of the dataset)
 
-save_location = '/data/sls/placesaudio/datasets/speak_amt_image_captions'
+save_location = '/home/ubuntu/perception-evaluation-framework/speak_amt_image_captions'
 
 
 # number of prompts per HIT
