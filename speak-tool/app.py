@@ -76,7 +76,7 @@ def recruitment(proctor_name, battery_name, test_idx):
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/consent/<proctor_name>/<battery_name>/record-voice/<test_idx>')
 def consent(proctor_name, battery_name, test_idx):
-	arg_string = scripts.get_args()[0] if scripts.get_args()[0] else ''
+	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 	# redirect worker to first question within HIT, multiple_attempts_true = 0 (false)
 	nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
 	return render_template(consent_template,
@@ -97,10 +97,6 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 	scripts.print_row('question:', question_idx)
 
 	is_not_preview = (ass_id != None)
-
-	with open(files_sublists[int(test_idx)-1][int(question_idx)], 'r') as fp:
-		print(files_sublists)
-		captionText = "Testing test test"
 	
 	if (not is_not_preview) or (ass_id + "_" + test_idx + "_starttime" in session):
 			return render_template(record_template,
@@ -111,7 +107,6 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 				question=question_idx,
 				questionIdx1Based=str(int(question_idx)+1),
 				numQuestions=n,
-				captionText=captionText,
 				assignmentId=ass_id,
 				hitId=hit_id,
 				turkSubmitTo=submit_path,
@@ -123,7 +118,8 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 			hitId=hit_id,
 			workerId=worker_id,
 			turkSubmitTo=submit_path,
-			retrySubmitUrl="/{}/{}/{}".format(proctor_name, battery_name, test_idx))
+			retrySubmitUrl="/{}/{}/record-voice/{}/{}/{}".format(proctor_name, battery_name,
+							test_idx, question_idx, multiple_attempts_true))
 
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -164,29 +160,31 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 		return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + question_idx + '/1' + arg_string)
 	print('    transcript: ' + transcript)
 
-	with open(files_sublists[int(test_idx)-1][int(question_idx)], 'r') as fp:
-		gtruth_str = "Testing test test"
-
 	# validation 1a: count number of words transcribed; accept/reject based on # words threshold
 	# validation 1b: measure length of audio file; accept/reject based on length threshold
 	# output True iff pass val1a and val1b
 	# save in user's specific accept_hit gradesheet
-	test_numwords = scripts.val1a(transcript, 4)
-	test_soundlength = scripts.val1b(filename, 1)
-	test_wer = scripts.val2(gtruth_str, transcript)
+	test_numwords = scripts.val1a(transcript, 15)
+	test_soundlength = scripts.val1b(filename, 5)
 	print('    val1a (numwords): ' + str(test_numwords))
 	print('    val1b (soundlength): ' + str(test_soundlength))
-	print('    val2 (WER): ' + str(test_wer))
 	#session[ass_id + "_" + test_idx + "_" + question_idx] = test_numwords & test_soundlength# & (test_wer < 0.2)
-	session[ass_id + "_" + test_idx + "_" + question_idx] = test_soundlength & bool(test_wer <= 0.5)
+	session[ass_id + "_" + test_idx + "_" + question_idx] = test_soundlength & test_numwords & test_soundlength
 	print("    worker passes this task:",session[ass_id + "_" + test_idx + "_" + question_idx])
 
 	if (session[ass_id + "_" + test_idx + "_" + question_idx] != True):
 		return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + question_idx + '/1' + arg_string)
 	else:	
 		print('  workerId:', worker_id, 'redirecting...')
-		return redirect('/' + proctor_name + '/' + battery_name + '/thanks/' + test_idx + '/' + question_idx + arg_string)
+		return redirect('/' + proctor_name + '/' + battery_name + '/evaluate-synthesized-voice/' + test_idx + '/' + question_idx + arg_string)
 
+@app.route('/<proctor_name>/<battery_name>/evaluate-synthesized-response/<test_idx>/<question_idx>', methods=['GET', 'POST'])
+def evaluate_synthesized_response(proctor_name, battery_name, test_idx, question_idx):
+	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	submitEvaluation = '/' + proctor_name + '/' + battery_name + '/thanks/' + test_idx + '/' + question_idx + arg_string
+	return render_template(evaluation_template,
+		submitEvaluation=submitEvaluation
+	)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 4: data collection complete (if applicable, tell mturk that worker is done)

@@ -4,7 +4,6 @@ profile = 'default'									# user AWS credentials (reads access keys from ~/.aw
 env = 'sandbox'											# environment (sandbox OR production)
 
 # task-specific config
-#flask_url = 'https://arcas.csail.mit.edu:5000'							# url of flask app
 flask_url = 'https://percepteval.net'
 battery = 'prosody_task'										# battery name
-hits_save_location = '/home/ubuntu/speak-tool/mturk'			# where to save assignment data
+hits_save_location = '/home/ubuntu/perception-evaluation-framework/speak-tool/mturk'			# where to save assignment data

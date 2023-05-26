@@ -72,7 +72,7 @@ https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications
 ```
 location / {
         include uwsgi_params;
-        uwsgi_pass unix:/data/sls/u/dharwath/code/speak_tool_instances/image_caption_template/prosody_task.sock;
+        uwsgi_pass unix:/data/sls/u/dharwath/code/speak_tool_instances/image_caption_template/image_caption_task.sock;
      }
 ```
 Where the path provided to uwsgi_pass points to the directory that the server code lives in on your filesystem.
