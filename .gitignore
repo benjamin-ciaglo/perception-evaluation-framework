@@ -1,1 +1,3 @@
 *.pyc
+speak_amt_image_captions/
+speak-tool/scripts/__pycache__/
