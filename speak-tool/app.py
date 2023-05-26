@@ -189,10 +189,10 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 		return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + question_idx + '/1' + arg_string)
 	else:	
 		print('  workerId:', worker_id, 'redirecting...')
-		return redirect('/' + proctor_name + '/' + battery_name + '/evaluate-synthesized-voice/' + test_idx + '/' + question_idx + arg_string)
+		return redirect('/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/' + question_idx + arg_string)
 
-@app.route('/<proctor_name>/<battery_name>/evaluate-synthesized-response/<test_idx>/<question_idx>', methods=['GET', 'POST'])
-def evaluate_synthesized_response(proctor_name, battery_name, test_idx, question_idx):
+@app.route('/<proctor_name>/<battery_name>/evaluate/<test_idx>/<question_idx>', methods=['GET', 'POST'])
+def evaluate(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 	print('evaluate: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
