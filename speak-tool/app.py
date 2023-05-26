@@ -56,6 +56,8 @@ def hello_world():
 def init_test(proctor_name, battery_name, test_idx):
 	if proctor_name != 'turk': flask.abort(404)					# for this particular task, only turk allowed
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	print('init: ')
+	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
 	session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
 	return redirect('/' + 'recruitment' + '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string)
@@ -65,7 +67,9 @@ def init_test(proctor_name, battery_name, test_idx):
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/recruitment/<proctor_name>/<battery_name>/record-voice/<test_idx>')
 def recruitment(proctor_name, battery_name, test_idx):
-	arg_string = scripts.get_args()[0] if scripts.get_args()[0] else ''
+	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	print('recruitment: ')
+	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx
 	return render_template(recruitment_template,
 			nextPage=nextPage
@@ -77,6 +81,8 @@ def recruitment(proctor_name, battery_name, test_idx):
 @app.route('/consent/<proctor_name>/<battery_name>/record-voice/<test_idx>')
 def consent(proctor_name, battery_name, test_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	print('consent: ')
+	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	# redirect worker to first question within HIT, multiple_attempts_true = 0 (false)
 	nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
 	return render_template(consent_template,
@@ -89,6 +95,8 @@ def consent(proctor_name, battery_name, test_idx):
 @app.route('/<proctor_name>/<battery_name>/record-voice/<test_idx>/<question_idx>/<multiple_attempts_true>')
 def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts_true):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	print('record: ')
+	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	if (multiple_attempts_true == '1'): print('\n  ---- worker recording (failed the first time) -----')
 	else: print('\n  ---- worker recording for',battery_name,'(new) -----')
 	scripts.print_row('assignmentId:', ass_id)
@@ -128,6 +136,8 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 @app.route('/<proctor_name>/<battery_name>/upload-voice/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def upload(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	print('upload: ')
+	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	filename = os.path.join(save_location,env,files_sublists[int(test_idx)-1][int(question_idx)].strip(".txt"),worker_id+"_"+ass_id+".wav")
 	print('  workerId:', worker_id, 'recorded. uploading to file ' + filename +'...')
 	os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -150,6 +160,8 @@ def upload(proctor_name, battery_name, test_idx, question_idx):
 @app.route('/<proctor_name>/<battery_name>/validate-voice/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def validate(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	print('validate: ')
+	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	print('\n  workerId:', worker_id, 'validating...')
 
 	# validation 1: transcribe worker-uploaded audio file
@@ -181,6 +193,8 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 @app.route('/<proctor_name>/<battery_name>/evaluate-synthesized-response/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def evaluate_synthesized_response(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	print('evaluate: ')
+	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	submitEvaluation = '/' + proctor_name + '/' + battery_name + '/thanks/' + test_idx + '/' + question_idx + arg_string
 	return render_template(evaluation_template,
 		submitEvaluation=submitEvaluation
@@ -192,6 +206,8 @@ def evaluate_synthesized_response(proctor_name, battery_name, test_idx, question
 @app.route('/<proctor_name>/<battery_name>/thanks/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def complete(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	print('complete: ')
+	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	print('\n    workerId:', worker_id, '  successfully redirected. checking if worker completed all questions...')
 
 	filename = os.path.join(save_location,env,files_sublists[int(test_idx)-1][int(question_idx)].strip(".txt"),worker_id+"_"+ass_id+".wav")
@@ -271,6 +287,8 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 @app.route('/<proctor_name>/<battery_name>/submit/<test_idx>', methods=['GET', 'POST'])
 def submit(proctor_name, battery_name, test_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	print('submit: ')
+	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 
 	print("\nass_id:",ass_id)
 	print("hit_id:",hit_id)
