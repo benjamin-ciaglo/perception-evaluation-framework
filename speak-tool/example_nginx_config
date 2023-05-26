@@ -68,7 +68,7 @@ server {
                 # as directory, then fall back to displaying a 404.
                 #try_files $uri $uri/ =404;
                 include uwsgi_params;
-                uwsgi_pass unix:/home/ubuntu/perception-evaluation-framework/speak-tool/image_caption_task.sock;
+                uwsgi_pass unix:/home/ubuntu/perception-evaluation-framework/speak-tool/prosody_task.sock;
         }
 
         # pass PHP scripts to FastCGI server
