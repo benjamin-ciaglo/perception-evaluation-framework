@@ -25,8 +25,8 @@ def extract_ipus(x_polly, x_var):
     """."""
     bot_adjacent_ipu, human_adjacent_ipu = [], []
 
-    bot_adjacent_ipu = [datapoint for datapoint in x_polly.flatten() if datapoint > 0]
-    human_adjacent_ipu = [datapoint for datapoint in x_var.flatten() if datapoint > 0]
+    bot_adjacent_ipu = [datapoint for datapoint in x_polly if datapoint > 0]
+    human_adjacent_ipu = [datapoint for datapoint in x_var if datapoint > 0]
     return bot_adjacent_ipu, human_adjacent_ipu
 
 
@@ -72,7 +72,7 @@ def main(save_location, env, worker_id, ass_id):
     """."""
     frame_period = 5
     transcript_filename = os.path.join(save_location, env, \
-                                       worker_id + "_" + ass_id + "_worker_transcript.txt")
+        worker_id + "_" + ass_id + "_worker_transcript.txt")
     wav_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
     print(transcript_filename)
     bot_adjacent_ipus = []
