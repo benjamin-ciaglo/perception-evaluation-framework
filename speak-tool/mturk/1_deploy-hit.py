@@ -6,6 +6,7 @@ from init import init, yes_no
 import argparse
 import json
 import os.path
+import uuid
 
 # ---------------------------------------------------------------------------------------
 # deploy HIT
@@ -13,7 +14,8 @@ import os.path
 
 def deployHITs(client, preview_url, logdir):
 
-    logfile = os.path.join(logdir, 'launched_%s.json' % (preview_url))
+    file_uuid = uuid.uuid4()
+    logfile = os.path.join(logdir, 'launched_%s.json' % (file_uuid))
 
     if os.path.exists(logfile):
         to_continue = yes_no('This set of HITs appears to have already been launched. Continue? (y/n)')
