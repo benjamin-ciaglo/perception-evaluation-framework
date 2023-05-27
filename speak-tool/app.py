@@ -2,15 +2,16 @@
 # flask app
 
 # flask libraries
-from flask import Flask, request, render_template, redirect, abort, url_for, session
-from flask_sslify import SSLify
+from flask import Flask, request, render_template, redirect, session
 # python/third-party libraries
-from collections import OrderedDict
-import os, requests, numpy, urllib, time, argparse, geoip2.database#, librosa
+import os
+import urllib
+import time
+import geoip2.database
 # helpers
 import scripts
-
-
+# world
+from world import experiment
 	
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # setup
@@ -18,7 +19,8 @@ import scripts
 env = 'sandbox' # 'production' vs. 'sandbox'
 
 with open("app_config.txt", "r+") as config:
-	for line in config: exec(line)
+	for line in config:
+		exec(line)
 
 localtime = time.asctime(time.localtime(time.time()))
 print("\n\n----- NEW SESSION %s, ENVIRONMENT: %s ---------------------------" % (localtime, env))
@@ -43,7 +45,8 @@ def hello_world():
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/<proctor_name>/<battery_name>/<test_idx>')
 def init_test(proctor_name, battery_name, test_idx):
-	if proctor_name != 'turk': flask.abort(404)					# for this particular task, only turk allowed
+	if proctor_name != 'turk':
+		return redirect('/')
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 	print('init: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
@@ -87,14 +90,16 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 	print('record: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
-	if (multiple_attempts_true == '1'): print('\n  ---- worker recording (failed the first time) -----')
-	else: print('\n  ---- worker recording for',battery_name,'(new) -----')
+	if (multiple_attempts_true == '1'):
+		print('\n  ---- worker recording (failed the first time) -----')
+	else:
+		print('\n  ---- worker recording for', battery_name, '(new) -----')
 	scripts.print_row('assignmentId:', ass_id)
 	scripts.print_row('workerId:', worker_id)
 	scripts.print_row('test:', test_idx)
 	scripts.print_row('question:', question_idx)
 
-	is_not_preview = (ass_id != None)
+	is_not_preview = (ass_id is not None)
 	
 	if (not is_not_preview) or (ass_id + "_" + test_idx + "_starttime" in session):
 			return render_template(record_template,
@@ -128,7 +133,7 @@ def upload(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 	print('upload: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
-	filename = os.path.join(save_location,env,worker_id+"_"+ass_id+".wav")
+	filename = os.path.join(save_location, env, worker_id + "_" + ass_id + ".wav")
 	print('  workerId:', worker_id, 'recorded. uploading to file ' + filename +'...')
 	os.makedirs(os.path.dirname(filename), exist_ok=True)
 	print('  request.files:',request.files)
@@ -174,14 +179,15 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 	session[ass_id + "_" + test_idx + "_" + question_idx] = test_soundlength & test_numwords & test_soundlength
 	print("    worker passes this task:",session[ass_id + "_" + test_idx + "_" + question_idx])
 
-	if (session[ass_id + "_" + test_idx + "_" + question_idx] != True):
+	if not session[ass_id + "_" + test_idx + "_" + question_idx]:
 		return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + question_idx + '/1' + arg_string)
 	else:	
+		experiment.main(save_location, env, worker_id, ass_id)
 		print('  workerId:', worker_id, 'redirecting...')
 		return redirect('/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/' + question_idx + arg_string)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# STEP 4: data collection complete (if applicable, tell mturk that worker is done)
+# STEP 4: evaluate synthesized response
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/<proctor_name>/<battery_name>/evaluate/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def evaluate(proctor_name, battery_name, test_idx, question_idx):
@@ -204,7 +210,6 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 	print('\n    workerId:', worker_id, '  successfully redirected. checking if worker completed all questions...')
 
 	filename = os.path.join(save_location,env,worker_id+"_"+ass_id+".wav")
-	filedir = os.path.dirname(filename)
 
 	# check if user is at last question
 	if int(question_idx) != (n-1):
@@ -219,13 +224,14 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 		try:
 			for i in range(0,n):
 				print('    test',str(i),'passed:', session[ass_id + "_" + test_idx + "_" + str(i)])
-				if session[ass_id + "_" + test_idx + "_" + str(i)] == True: num_passes += 1
-		except:
+				if session[ass_id + "_" + test_idx + "_" + str(i)]:
+					num_passes += 1
+		except Exception:
 			num_passes = 0
 		print("    num passes:", num_passes)
 		accept_hit = True if (num_passes / n >= accept_criteria) else False
 		session[ass_id + "_" + test_idx + "_" + 'overall'] = accept_hit
-		print('    workerId:', worker_id + ',', 'assignmentId:', ass_id + ',', '# tests passed:',num_passes,"/",n)
+		print('    workerId:', worker_id + ',', 'assignmentId:', ass_id + ',', '# tests passed:',num_passes,"/", n)
 		print('      accept hit:', str(accept_hit) + ',', 'saved.')
 
 	# final thanks + instructions for worker
@@ -243,7 +249,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 			worker_country = "%s (%s)" % (ip_loc.country.name, ip_loc.country.iso_code)
 			worker_region = "%s (%s)" % (ip_loc.subdivisions.most_specific.name, ip_loc.subdivisions.most_specific.iso_code)
 			worker_city = ip_loc.city.name
-		except:
+		except Exception:
 			worker_country = "N/A"
 			worker_region = "N/A"
 			worker_city = "N/A"
@@ -256,8 +262,8 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 				'worker_ip':worker_ip, 'worker_country':worker_country, 'worker_region':worker_region, 'worker_city':worker_city,
 				'test_idx':test_idx, 'test_passed':session[ass_id + "_" + test_idx + "_" + 'overall'], 'questions_passed':''	}
 
-		for i in range(0,n):
-			filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_transcript.txt")
+		for i in range(0, n):
+			filename = os.path.join(save_location, env, worker_id + "_" + ass_id + "_transcript.txt")
 			payload['question_'+str(i)+'_rec'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+".wav")
 			payload['question_'+str(i)+'_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+"_transcript.txt")
 			with open(filename,'r') as f:
@@ -297,7 +303,7 @@ def submit(proctor_name, battery_name, test_idx):
 		worker_country = "%s (%s)" % (ip_loc.country.name, ip_loc.country.iso_code)
 		worker_region = "%s (%s)" % (ip_loc.subdivisions.most_specific.name, ip_loc.subdivisions.most_specific.iso_code)
 		worker_city = ip_loc.city.name
-	except:
+	except Exception:
 		worker_country = "N/A"
 		worker_region = "N/A"
 		worker_city = "N/A"
@@ -310,8 +316,8 @@ def submit(proctor_name, battery_name, test_idx):
 			'worker_ip':worker_ip, 'worker_country':worker_country, 'worker_region':worker_region, 'worker_city':worker_city,
 			'test_idx':test_idx, 'test_passed':session[ass_id + "_" + test_idx + "_" + 'overall'], 'questions_passed':''	}
 
-	for i in range(0,n):
-		filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_transcript.txt")
+	for i in range(0, n):
+		filename = os.path.join(save_location, env,worker_id + "_" + ass_id + "_transcript.txt")
 		payload['question_'+str(i)+'_rec'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+".wav")
 		payload['question_'+str(i)+'_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+"_transcript.txt")
 		with open(filename,'r') as f:
