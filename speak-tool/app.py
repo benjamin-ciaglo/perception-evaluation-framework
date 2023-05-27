@@ -237,7 +237,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 
 	filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
 
-	score_file = ass_id  + '_score.txt'
+	score_file = os.path.join(save_location, env, worker_id + "_" + ass_id + "_score.txt")
 	with open(score_file, 'w') as score_handle:
 		score_handle.write(selected_option + '\n')
 	# check if user is at last question
