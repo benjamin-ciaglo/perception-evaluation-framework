@@ -25,8 +25,8 @@ def extract_ipus(x_polly, x_var):
     """."""
     bot_adjacent_ipu, human_adjacent_ipu = [], []
 
-    bot_adjacent_ipu = [datapoint for datapoint in x_polly if datapoint > 0]
-    human_adjacent_ipu = [datapoint for datapoint in x_var if datapoint > 0]
+    bot_adjacent_ipu = [datapoint for datapoint in x_polly.flatten() if datapoint > 0]
+    human_adjacent_ipu = [datapoint for datapoint in x_var.flatten() if datapoint > 0]
     return bot_adjacent_ipu, human_adjacent_ipu
 
 
