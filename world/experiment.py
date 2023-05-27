@@ -117,7 +117,7 @@ def main(save_location, env, worker_id, ass_id):
         text_response += '</prosody>'
         start_index = end_index
     text_response += '</speak>'
-    polly_object = PollyWrapper(boto3.client('polly', region_name='us-east-1'), boto3.resource('s3'), region_name='us-east-1')
+    polly_object = PollyWrapper(boto3.client('polly', region_name='us-east-1'), boto3.resource('s3', region_name='us-east-1'))
     results = polly_object.synthesize(text_response, 'standard', 'Joanna', 'mp3', 'en-US', False)
     audio_stream = results[0]
 
