@@ -118,6 +118,8 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 	is_not_preview = (ass_id is not None)
 	
 	if (not is_not_preview) or (ass_id + "_" + test_idx + "_starttime" in session):
+			print(session)
+			print(ass_id)
 			return render_template(record_template,
 				error=multiple_attempts_true,
 				proctor=proctor_name,
