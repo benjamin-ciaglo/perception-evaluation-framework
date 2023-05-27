@@ -51,11 +51,6 @@ def hello_world():
 def returnAudioFile(audio_file_name):
     if not audio_file_name.endswith('.mp3'):
 	    return redirect('/')
-    parts = audio_file_name.split('_')
-    ass_id = parts[0]
-    test_idx = "1"
-    if (ass_id + "_" + test_idx + "_starttime" not in session):
-	    return redirect('/')
     directory = werkzeug.security.safe_join(save_location, env)
     path = audio_file_name
     return send_from_directory(directory,
