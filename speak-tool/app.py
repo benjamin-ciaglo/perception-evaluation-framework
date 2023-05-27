@@ -286,11 +286,11 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 				'test_idx':test_idx, 'test_passed':session[ass_id + "_" + test_idx + "_" + 'overall'], 'questions_passed':''	}
 
 		for i in range(0, n):
-			filename = os.path.join(save_location, env, worker_id + "_" + ass_id + "_worker_transcript.txt")
+			filename = os.path.join(save_location, env, worker_id + "_" + ass_id + "_worker_recording_transcript.txt")
 			payload['question_'+str(i)+'_rec'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+".wav")
-			payload['question_'+str(i)+'_worker_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+"_worker_transcript.txt")
+			payload['question_'+str(i)+'_worker_recording_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+"_worker_recording_transcript.txt")
 			with open(filename,'r') as f:
-				payload['question_'+str(i)+'_worker_transcript'] = f.read()
+				payload['question_'+str(i)+'_worker_recording_transcript'] = f.read()
 			payload['questions_passed'] = payload['questions_passed'] + " " + str(session[ass_id + "_" + test_idx + "_" + str(i)])
 		print('final payload:',payload)
 		###
@@ -340,11 +340,11 @@ def submit(proctor_name, battery_name, test_idx):
 			'test_idx':test_idx, 'test_passed':session[ass_id + "_" + test_idx + "_" + 'overall'], 'questions_passed':''	}
 
 	for i in range(0, n):
-		filename = os.path.join(save_location, env,worker_id + "_" + ass_id + "_worker_transcript.txt")
+		filename = os.path.join(save_location, env,worker_id + "_" + ass_id + "_worker_recording_transcript.txt")
 		payload['question_'+str(i)+'_rec'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+".wav")
-		payload['question_'+str(i)+'_worker_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+"_worker_transcript.txt")
+		payload['question_'+str(i)+'_worker_recording_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+"_worker_recording_transcript.txt")
 		with open(filename,'r') as f:
-			payload['question_'+str(i)+'_worker_transcript'] = f.read()
+			payload['question_'+str(i)+'_worker_recording_transcript'] = f.read()
 		payload['questions_passed'] = payload['questions_passed'] + " " + str(session[ass_id + "_" + test_idx + "_" + str(i)])
 	print('final payload:',payload)
 
