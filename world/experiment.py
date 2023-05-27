@@ -126,7 +126,7 @@ def main(save_location, env, worker_id, ass_id):
             worker_id + "_" + ass_id + "_synthesized.mp3")
         speech_text_file_name = os.path.join(save_location, \
             env, worker_id + "_" + ass_id + "_synthesized_transcript.txt")
-        with open(speech_file_name, 'wb', encoding='utf-8') as speech_file:
+        with open(speech_file_name, 'wb') as speech_file:
             speech_file.write(audio_stream.read())
         with open(speech_text_file_name, 'w', encoding='utf-8') as speech_text_file:
             speech_text_file.write(text_response)
