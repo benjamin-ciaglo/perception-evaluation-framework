@@ -95,7 +95,7 @@ def main(args):
         # if os.path.isfile(speech_file_name):
         # continue
         x, fs = sf.read(f)
-        f0, t = pw.harvest(x, fs, f0_floor=80.0, f0_ceil=370.0,
+        f0, t = pw.harvest(x, fs, f0_floor=80.0, f0_ceil=270,
                            frame_period=args.frame_period)
 
         f0_no_zeroes = [datapoint for datapoint in f0 if datapoint > 0]
@@ -111,15 +111,25 @@ def main(args):
         stripped_split_sentence = [re.sub(r'\W+', '', word) for word in split_sentence if word]
         syllable_counts = [get_syllable_count(word) if get_syllable_count(word) is not None else
                            get_syllable_count(split_sentence[i]) for i, word in enumerate(stripped_split_sentence)]
-        print(filename, sentence, syllable_counts)
+
         total_syllables = sum(syllable_counts)
         datapoints_per_syllable = len(f0_percent_change_sequence) / total_syllables
 
         start_index = 0
         text_response = '<speak>'
-        for i, word in enumerate(stripped_split_sentence):
-            syllables = syllable_counts[i]
-            end_index = start_index + int(syllables * datapoints_per_syllable)
+        response = "I appreciate your comprehensive weather summary. " + \
+            "It's interesting to hear the changes from last week to this week. " + \
+            "Do you find these changes affect your daily routines?"
+        split_response = response.split(' ')
+        stripped_split_response = [re.sub(r'\W+', '', word) for word in split_response if word]
+        syllable_counts_response = [get_syllable_count(word) if get_syllable_count(word) is not None else
+                           get_syllable_count(split_response[i]) for i, word in enumerate(stripped_split_response)]
+        total_syllables_response = sum(syllable_counts_response)
+        datapoints_per_syllable_response = len(f0_percent_change_sequence) / total_syllables_response
+
+        for i, word in enumerate(stripped_split_response):
+            syllables = syllable_counts_response[i]
+            end_index = start_index + int(syllables * datapoints_per_syllable_response)
             avg_percent_diff = np.average([datapoint for datapoint in f0_percent_change_sequence[start_index:end_index]])
             pitch_tag = round(avg_percent_diff, 0)
             if pitch_tag > 0:
@@ -127,11 +137,10 @@ def main(args):
             else:
                 pitch_tag = str(pitch_tag)
             text_response += '<prosody pitch="' + pitch_tag + '%">'
-            text_response += split_sentence[i]
+            text_response += split_response[i]
             text_response += '</prosody>'
             start_index = end_index
         text_response += '</speak>'
-
         polly_object = PollyWrapper(boto3.client('polly'), boto3.resource('s3'))
         results = polly_object.synthesize(text_response, 'standard', 'Joanna', 'mp3', 'en-US', False)
         audio_stream = results[0]
