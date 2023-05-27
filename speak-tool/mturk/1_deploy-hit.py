@@ -11,9 +11,9 @@ import os.path
 # deploy HIT
 # ---------------------------------------------------------------------------------------
 
-def deployHITs(client, preview_url, start_index, end_index, logdir):
+def deployHITs(client, preview_url, logdir):
 
-    logfile = os.path.join(logdir, 'launched_%d_%d.json' % (start_index, end_index))
+    logfile = os.path.join(logdir, 'launched_%s.json' % (preview_url))
 
     if os.path.exists(logfile):
         to_continue = yes_no('This set of HITs appears to have already been launched. Continue? (y/n)')
@@ -74,26 +74,24 @@ def deployHITs(client, preview_url, start_index, end_index, logdir):
 
     num_launched = 0
 
-    # loop through each sound
-    for i in range(start_index,end_index+1):
-        # prepare xml payload customized w/test idx
-        question_enc = question_xml.replace('${idx}',str(i))
+    # prepare xml payload customized w/test idx
+    question_enc = question_xml.replace('${idx}',str(1))
 
-        # create hit using xml payload and task attributes
-        hit = client.create_hit(**TaskAttributes,Question=question_enc)
+    # create hit using xml payload and task attributes
+    hit = client.create_hit(**TaskAttributes,Question=question_enc)
 
-        # save HIT type id for later
-        hit_type_id = hit['HIT']['HITTypeId']
+    # save HIT type id for later
+    hit_type_id = hit['HIT']['HITTypeId']
 
-        # save hit_id-to-test-idx mappings
-        hit_id_to_idx[hit['HIT']['HITId']] = i
+    # save hit_id-to-test-idx mappings
+    hit_id_to_idx[hit['HIT']['HITId']] = 1
 
-        launched_hits.append(hit)
+    launched_hits.append(hit)
 
-        num_launched += 1
+    num_launched += 1
 
-        if num_launched % 20 == 0:
-            print('Launched %d HITs...' % num_launched)
+    if num_launched % 20 == 0:
+        print('Launched %d HITs...' % num_launched)
 
     print(' ')
 
@@ -117,8 +115,6 @@ def deployHITs(client, preview_url, start_index, end_index, logdir):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Deploy a range of HITs')
     parser.add_argument('--logdir', dest='logdir', default='./hit_logs', help='Write the output log to this directory.')
-    parser.add_argument('start_index', type=int)
-    parser.add_argument('end_index', type=int)
     args = parser.parse_args()
     # parse config info (vars: region, profile, env, flask_url)
     with open("turk_config.txt", "r+") as config:
@@ -128,4 +124,4 @@ if __name__ == "__main__":
     client, preview_url = init(region, profile, env)
 
     # deploy HITs
-    deployHITs(client, preview_url, args.start_index, args.end_index, args.logdir)
+    deployHITs(client, preview_url, args.logdir)
