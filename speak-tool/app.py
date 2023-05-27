@@ -215,7 +215,9 @@ def evaluate(proctor_name, battery_name, test_idx, question_idx):
 	submitEvaluation = '/' + proctor_name + '/' + battery_name + '/thanks/' + test_idx + '/' + question_idx + arg_string
 	return render_template(evaluation_template,
 		submitEvaluation=submitEvaluation,
-		audioFile=audioFile
+		audioFile=audioFile,
+		worker_id=worker_id,
+		ass_id=ass_id
 	)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
