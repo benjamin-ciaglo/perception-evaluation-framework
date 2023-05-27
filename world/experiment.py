@@ -72,13 +72,13 @@ def main(save_location, env, worker_id, ass_id):
     """."""
     frame_period = 5
     transcript_filename = os.path.join(save_location, env, \
-        worker_id + "_" + ass_id + "_worker_transcript.txt")
+        worker_id + "_" + ass_id + "_worker_recording_transcript.txt")
     wav_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
     print(transcript_filename)
     bot_adjacent_ipus = []
     human_adjacent_ipus = []
 
-    speech_file_name = os.path.join(save_location, env, worker_id + "_" + ass_id + ".mp3")
+    #speech_file_name = os.path.join(save_location, env, worker_id + "_" + ass_id + ".mp3")
     x_var, fs_var = sf.read(wav_filename)
     f0_var = pw.harvest(x_var, fs_var, f0_floor=80.0, f0_ceil=270,
         frame_period=frame_period)[0]
@@ -124,16 +124,16 @@ def main(save_location, env, worker_id, ass_id):
     audio_stream = results[0]
 
     if audio_stream is not None:
-        static_speech_file_name = os.path.join('../speak-tool/static', \
+        speech_file_name = os.path.join(save_location, env, \
             worker_id + "_" + ass_id + "_synthesized.mp3")
         speech_text_file_name = os.path.join(save_location, \
             env, worker_id + "_" + ass_id + "_synthesized_transcript.txt")
-        with open(static_speech_file_name, 'wb') as static_speech_file:
-            static_speech_file.write(audio_stream.read())
+        with open(speech_file_name, 'wb') as speech_file:
+            speech_file.write(audio_stream.read())
         with open(speech_text_file_name, 'w', encoding='utf-8') as speech_text_file:
             speech_text_file.write(text_response)
 
-        x_polly, fs_polly = sf.read(static_speech_file_name)
+        x_polly, fs_polly = sf.read(speech_file_name)
         f0_polly = pw.harvest(x_polly, fs_polly, f0_floor=80.0, f0_ceil=270.0,
             frame_period=frame_period)[0]
 

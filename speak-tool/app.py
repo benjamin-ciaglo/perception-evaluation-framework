@@ -2,7 +2,7 @@
 # flask app
 
 # flask libraries
-from flask import Flask, request, render_template, redirect, session, url_for, send_from_directory
+from flask import Flask, request, render_template, redirect, session, send_from_directory, Response
 # python/third-party libraries
 import os
 import urllib
@@ -33,7 +33,7 @@ with open("app_config.txt", "r+") as config:
 localtime = time.asctime(time.localtime(time.time()))
 print("\n\n----- NEW SESSION %s, ENVIRONMENT: %s ---------------------------" % (localtime, env))
 
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__)
 app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
 app_dir = os.path.abspath(os.path.dirname(__file__))					# global directory var to make code more readable
 app.secret_key = 'SooperDooperSecret'							# secret key used for session cookies
@@ -50,11 +50,15 @@ def hello_world():
 @app.route('/<audio_file_name>')
 def returnAudioFile(audio_file_name):
     if not audio_file_name.endswith('.mp3'):
-	    return redirect('/')
+		return flask.abort(401)
     directory = werkzeug.security.safe_join(save_location, env)
     path = audio_file_name
     return send_from_directory(directory,
 		path)
+
+@app.errorhandler(401)
+def custom_401(error):
+    return Response('You have already attempted this task, or are trying to access an unauthorized resource. Please contact an administrator if you believe you should not be receiving this message.', 401, {})
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 0: initialize test
@@ -62,8 +66,15 @@ def returnAudioFile(audio_file_name):
 @app.route('/<proctor_name>/<battery_name>/<test_idx>')
 def init_test(proctor_name, battery_name, test_idx):
 	if proctor_name != 'turk':
-		return redirect('/')
+		return flask.abort(404)
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+
+	worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
+	if worker_id in worker_already_started_this_task:
+		return flask.abort(401)
+	else:
+		with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
+			wf.write('Worker started task.')
 	print('init: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	print('submit_path: ', submit_path, ' arg_string: ', arg_string)
