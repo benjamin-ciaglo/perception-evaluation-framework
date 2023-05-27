@@ -126,7 +126,7 @@ def main(save_location, env, worker_id, ass_id):
     if audio_stream is not None:
         speech_file_name = os.path.join(save_location, env, \
             worker_id + "_" + ass_id + "_synthesized.mp3")
-        static_speech_file_name = os.path.join(save_location, env, \
+        static_speech_file_name = os.path.join('../speak-tool/static', \
             worker_id + "_" + ass_id + "_synthesized.mp3")
         speech_text_file_name = os.path.join(save_location, \
             env, worker_id + "_" + ass_id + "_synthesized_transcript.txt")
