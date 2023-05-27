@@ -124,20 +124,16 @@ def main(save_location, env, worker_id, ass_id):
     audio_stream = results[0]
 
     if audio_stream is not None:
-        speech_file_name = os.path.join(save_location, env, \
-            worker_id + "_" + ass_id + "_synthesized.mp3")
         static_speech_file_name = os.path.join('../speak-tool/static', \
             worker_id + "_" + ass_id + "_synthesized.mp3")
         speech_text_file_name = os.path.join(save_location, \
             env, worker_id + "_" + ass_id + "_synthesized_transcript.txt")
-        with open(speech_file_name, 'wb') as speech_file:
-            speech_file.write(audio_stream.read())
         with open(static_speech_file_name, 'wb') as static_speech_file:
             static_speech_file.write(audio_stream.read())
         with open(speech_text_file_name, 'w', encoding='utf-8') as speech_text_file:
             speech_text_file.write(text_response)
 
-        x_polly, fs_polly = sf.read(speech_file_name)
+        x_polly, fs_polly = sf.read(static_speech_file_name)
         f0_polly = pw.harvest(x_polly, fs_polly, f0_floor=80.0, f0_ceil=270.0,
             frame_period=frame_period)[0]
 
@@ -146,7 +142,7 @@ def main(save_location, env, worker_id, ass_id):
         bot_adjacent_ipus += [bot_adjacent_ipu]
         human_adjacent_ipus += [human_adjacent_ipu]
 
-    print(speech_file_name + ' entrained.. ')
+    print(static_speech_file_name + ' entrained.. ')
     print('Loop complete. Check /comparison directory.')
 
     file_handle = open(os.path.join(save_location, env, \
