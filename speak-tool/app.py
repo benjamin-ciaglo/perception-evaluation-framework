@@ -13,8 +13,8 @@ import scripts
 # world
 import importlib.util
 
-module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-module_name = 'world'
+module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../world/'))
+module_name = 'experiment'
 
 module_spec = importlib.util.spec_from_file_location(module_name, os.path.join(module_path, f"{module_name}.py"))
 module = importlib.util.module_from_spec(module_spec)
@@ -189,7 +189,7 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 	if not session[ass_id + "_" + test_idx + "_" + question_idx]:
 		return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + question_idx + '/1' + arg_string)
 	else:	
-		world.experiment.main(save_location, env, worker_id, ass_id)
+		experiment.main(save_location, env, worker_id, ass_id)
 		print('  workerId:', worker_id, 'redirecting...')
 		return redirect('/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/' + question_idx + arg_string)
 
