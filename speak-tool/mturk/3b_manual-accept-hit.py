@@ -14,24 +14,24 @@ def reviewHITs(client, logfile):
 
 	retrieved_HITs = []
 
-    if logfile == '':
-        list_all = yes_no('No logfile provided, all existing HITs will be printed. Continue? (y/n)')
-        if list_all:
-            retrieved_HITs = []
-            paginator = client.get_paginator('list_hits')
-            for response in paginator.paginate():
-                retrieved_HITs.extend(response['HITs'])
-        else:
-            print('Aborting')
-            return
-    else:
-        with open(logfile, 'r') as fp:
-            log_dict = json.load(fp)
-        print('Retrieving %d HITs...' % len(log_dict['hit_id_to_idx'].keys()))
-        print(' ')
-        for HITId in log_dict['hit_id_to_idx'].keys():
-            r = client.get_hit(HITId=HITId)
-            retrieved_HITs.append(r['HIT'])
+	if logfile == '':
+		list_all = yes_no('No logfile provided, all existing HITs will be printed. Continue? (y/n)')
+		if list_all:
+			retrieved_HITs = []
+			paginator = client.get_paginator('list_hits')
+			for response in paginator.paginate():
+				retrieved_HITs.extend(response['HITs'])
+		else:
+			print('Aborting')
+			return
+	else:
+		with open(logfile, 'r') as fp:
+			log_dict = json.load(fp)
+		print('Retrieving %d HITs...' % len(log_dict['hit_id_to_idx'].keys()))
+		print(' ')
+		for HITId in log_dict['hit_id_to_idx'].keys():
+			r = client.get_hit(HITId=HITId)
+			retrieved_HITs.append(r['HIT'])
 
 	print(' ')
 	print(' ')
@@ -122,8 +122,8 @@ def reviewHITs(client, logfile):
 # ---------------------------------------------------------------------------------------
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Manually review a group of HITs')
-    parser.add_argument('--logfile', dest='logfile', default='', help='Review the HITs in this logfile. If no file is specified, review all existing HITs.')
-    args = parser.parse_args()
+	parser.add_argument('--logfile', dest='logfile', default='', help='Review the HITs in this logfile. If no file is specified, review all existing HITs.')
+	args = parser.parse_args()
 	# parse config info (vars: region, profile, env, flask_url)
 	with open("turk_config.txt", "r+") as config:
 		for line in config: exec(line)
