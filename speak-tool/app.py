@@ -48,8 +48,9 @@ def hello_world():
 
 @app.route('/<audio_file_name>')
 def returnAudioFile(audio_file_name):
+    path_to_audio_file = os.path.join(save_location, env, worker_id + "_" + ass_id + "_synthesized.mp3")
     return send_file(
-         audio_file_name,
+         path_to_audio_file,
          mimetype="audio/mpeg",
          as_attachment=True,
          download_name="synthesized_response.wav")
