@@ -2,11 +2,12 @@
 # flask app
 
 # flask libraries
-from flask import Flask, request, render_template, redirect, session, send_file
+from flask import Flask, request, render_template, redirect, session, send_from_directory
 # python/third-party libraries
 import os
 import urllib
 import time
+import werkzeug
 import geoip2.database
 # helpers
 import scripts
@@ -48,12 +49,13 @@ def hello_world():
 
 @app.route('/<audio_file_name>')
 def returnAudioFile(audio_file_name):
-    path_to_audio_file = os.path.join(save_location, env, audio_file_name)
-    return send_file(
-         path_to_audio_file,
-         mimetype="audio/mpeg",
-         as_attachment=True,
-         download_name="synthesized_response.wav")
+    directory = werkzeug.security.safe_join(save_location, env)
+    path = audio_file_name
+    return send_from_directory(directory,
+		path,
+		mimetype="audio/mpeg",
+		as_attachment=True,
+		download_name="synthesized_response.mp3")
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 0: initialize test
