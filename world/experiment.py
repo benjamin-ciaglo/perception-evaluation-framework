@@ -71,7 +71,7 @@ def savefig(filename, fig_list, log=True):
 def main(save_location, env, worker_id, ass_id):
     """."""
     transcript_filename = os.path.join(save_location, env, \
-                                       worker_id + "_" + ass_id + "_transcript.txt")
+                                       worker_id + "_" + ass_id + "_worker_transcript.txt")
     wav_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
     print(transcript_filename)
     bot_adjacent_ipus = []
