@@ -227,8 +227,8 @@ def evaluate(proctor_name, battery_name, test_idx, question_idx):
 @app.route('/<proctor_name>/<battery_name>/thanks/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def complete(proctor_name, battery_name, test_idx, question_idx):
 	option1 = request.form.get('option1')
-    option2 = request.form.get('option2')
-    option3 = request.form.get('option3')
+	option2 = request.form.get('option2')
+	option3 = request.form.get('option3')
 	print(option1, option2, option3)
 
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
