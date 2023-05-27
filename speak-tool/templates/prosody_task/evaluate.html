@@ -15,13 +15,23 @@
 			<audio controls>
 				<source src="{{ audioURL }}" type="audio/mpeg">
 			</audio>
-			<ol>
-				<li>On a scale of 1 to 7, how trustworthy does the software-based speaker sound to you?</li>
-			</ol>
-			
-			</div>
-			<a href="{{ submitEvaluation }}">
-				<button>Submit Evaluation</button>
-			</a>
+			<form method="POST" action="{{ submitEvaluation }}">
+				<label>
+				<input type="checkbox" name="option1" value="Option 1">
+				Option 1
+				</label>
+				<br>
+				<label>
+				<input type="checkbox" name="option2" value="Option 2">
+				Option 2
+				</label>
+				<br>
+				<label>
+				<input type="checkbox" name="option3" value="Option 3">
+				Option 3
+				</label>
+				<br>
+				<input type="submit" value="Submit">
+			</form>
 	</body>
 </html>
