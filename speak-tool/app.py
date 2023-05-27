@@ -2,7 +2,7 @@
 # flask app
 
 # flask libraries
-from flask import Flask, request, render_template, redirect, session, url_for
+from flask import Flask, request, render_template, redirect, session, url_for, send_from_directory
 # python/third-party libraries
 import os
 import urllib
@@ -46,6 +46,13 @@ iplocator = geoip2.database.Reader(app_dir+'/scripts/geolite2/GeoLite2-City.mmdb
 @app.route('/')
 def hello_world():
 	return str("Hello world!")
+
+@app.route('/<audio_file_name>')
+def returnAudioFile(audio_file_name):
+    directory = werkzeug.security.safe_join(save_location, env)
+    path = audio_file_name
+    return send_from_directory(directory,
+		path)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 0: initialize test
