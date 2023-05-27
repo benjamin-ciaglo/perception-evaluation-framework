@@ -15,20 +15,41 @@
 			<audio controls>
 				<source src="{{ audioURL }}" type="audio/mpeg">
 			</audio>
+			<p><b>Question: </b>On a scale of 1 to 7, how friendly does the speaker sound to you?</p>
 			<form method="POST" action="{{ submitEvaluation }}">
 				<label>
 				<input type="checkbox" name="option1" value="Option 1">
-				Option 1
+				7 - Extremely friendly
 				</label>
 				<br>
 				<label>
 				<input type="checkbox" name="option2" value="Option 2">
-				Option 2
+				6 - Moderately friendly
 				</label>
 				<br>
 				<label>
 				<input type="checkbox" name="option3" value="Option 3">
-				Option 3
+				5 - Somewhat friendly
+				</label>
+				<br>
+				<label>
+				<input type="checkbox" name="option1" value="Option 1">
+				4 - Neither friendly nor unfriendly
+				</label>
+				<br>
+				<label>
+				<input type="checkbox" name="option1" value="Option 1">
+				3 - Somewhat unfriendly
+				</label>
+				<br>
+				<label>
+				<input type="checkbox" name="option1" value="Option 1">
+				2 - Moderately unfriendly
+				</label>
+				<br>
+				<label>
+				<input type="checkbox" name="option1" value="Option 1">
+				1 - Extremely unfriendly
 				</label>
 				<br>
 				<input type="submit" value="Submit">
