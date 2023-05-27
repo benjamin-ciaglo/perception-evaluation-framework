@@ -14,11 +14,11 @@ import scripts
 import sys
 
 # Add the 'perception-evaluation-framework' directory to the Python search path
-framework_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'perception-evaluation-framework'))
+framework_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(framework_path)
 
 # Import the 'experiment' module from 'world'
-from perception_evaluation_framework.world import experiment
+from world import experiment
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # setup
