@@ -10,16 +10,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
 import pyworld as pw
+from polly_wrapper import PollyWrapper
 import boto3
 from pysyllables import get_syllable_count
-
-import importlib.util
-module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../world/'))
-module_name = 'polly_wrapper'
-
-module_spec = importlib.util.spec_from_file_location(module_name, os.path.join(module_path, f"{module_name}.py"))
-module = importlib.util.module_from_spec(module_spec)
-module_spec.loader.exec_module(module)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--frame_period", type=float, default=5.0)

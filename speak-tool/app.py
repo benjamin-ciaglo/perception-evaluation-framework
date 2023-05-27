@@ -10,15 +10,14 @@ import time
 import geoip2.database
 # helpers
 import scripts
+
+import sys
+
+# Add the 'perception-evaluation-framework' directory to the Python search path
+framework_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'perception-evaluation-framework'))
+sys.path.append(framework_path)
 # world
-import importlib.util
-
-module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../world/'))
-module_name = 'experiment'
-
-module_spec = importlib.util.spec_from_file_location(module_name, os.path.join(module_path, f"{module_name}.py"))
-module = importlib.util.module_from_spec(module_spec)
-module_spec.loader.exec_module(module)
+from world import experiment
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # setup
