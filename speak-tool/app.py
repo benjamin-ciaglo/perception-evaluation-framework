@@ -266,7 +266,6 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 
 		for i in range(0,n):
 			filename = os.path.join(save_location,env,files_sublists[int(test_idx)-1][i].strip(".txt"),worker_id+"_"+ass_id+"_transcript.txt")
-			payload['question_'+str(i)+'_img'] = str(files_sublists[int(test_idx)-1][i])
 			payload['question_'+str(i)+'_rec'] = os.path.join(app_dir,'user-content',proctor_name,files_sublists[int(test_idx)-1][i].strip(".txt"),worker_id+"_"+ass_id+".wav")
 			payload['question_'+str(i)+'_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,files_sublists[int(test_idx)-1][i].strip(".txt"),worker_id+"_"+ass_id+"_transcript.txt")
 			with open(filename,'r') as f:

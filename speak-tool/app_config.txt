@@ -1,14 +1,7 @@
 # app_config: configuration file for Speak flask app
 
-# path to text file listing all prompt file locations
-# if prompts are located in an external dataset: use a symbolic link in the repository directory, in order to avoid excess nested subdirectories
-# (paths are also used when saving worker recordings)
-
-input_files = 'input_images.txt'
-
 
 # path to templates (within '/templates' subdirectory of this repo)
-
 record_template = 'prosody_task/recording_prompt.html'
 thanks_template = 'prosody_task/thanks_turk.html'
 recruitment_template = 'prosody_task/recruitment.html'
@@ -18,12 +11,9 @@ evaluation_template = 'prosody_task/evaluate.html'
 # where to save all turk worker data
 save_location = '/home/ubuntu/perception-evaluation-framework/speak_amt_prosody'
 
-
 # number of prompts per HIT
-
 n = 1
 
 # %age of tests within HIT that worker must pass in order to accept HIT
 # (only used if workers are allowed to continue after failing validation steps)
-
 accept_criteria = 0.90

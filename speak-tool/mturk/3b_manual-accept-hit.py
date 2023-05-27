@@ -2,7 +2,7 @@
 # author: chris song
 
 import boto3, xmltodict, json, os
-from init import init
+from init import init, yes_no
 import argparse
 import json
 import os.path
