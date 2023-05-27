@@ -1,0 +1,11 @@
+boto3
+botocore
+matplotlib
+numpy
+playsound
+pysyllables
+pytest
+pyworld
+requests
+scipy
+soundfile
