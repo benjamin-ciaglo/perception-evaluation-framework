@@ -2,7 +2,7 @@
 # flask app
 
 # flask libraries
-from flask import Flask, request, render_template, redirect, session, send_file
+from flask import Flask, request, render_template, redirect, session
 # python/third-party libraries
 import os
 import urllib
@@ -46,14 +46,6 @@ iplocator = geoip2.database.Reader(app_dir+'/scripts/geolite2/GeoLite2-City.mmdb
 def hello_world():
 	return str("Hello world!")
 
-@app.route('/<audio_file_name>')
-def returnAudioFile(audio_file_name):
-    path_to_audio_file = os.path.join(save_location, env, audio_file_name)
-    return send_file(
-         path_to_audio_file,
-         mimetype="audio/mpeg",
-         as_attachment=True,
-         attachment_filename="synthesized_response.mp3")
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 0: initialize test
@@ -209,11 +201,11 @@ def evaluate(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 	print('evaluate: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
-	audioFile = worker_id+"_"+ass_id+"_synthesized.mp3"
-	submitEvaluation = 'file:///' + proctor_name + '/' + battery_name + '/thanks/' + test_idx + '/' + question_idx + arg_string
+	audioPath = 'file://' + os.path.join(save_location,env,worker_id+"_"+ass_id+"_synthesized.mp3")
+	submitEvaluation = '/' + proctor_name + '/' + battery_name + '/thanks/' + test_idx + '/' + question_idx + arg_string
 	return render_template(evaluation_template,
 		submitEvaluation=submitEvaluation,
-		audioFile=audioFile
+		audioPath=audioPath
 	)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
