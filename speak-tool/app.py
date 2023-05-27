@@ -52,7 +52,7 @@ def returnAudioFile(audio_file_name):
          audio_file_name,
          mimetype="audio/mpeg",
          as_attachment=True,
-         attachment_filename="synthesized_response.wav")
+         download_name="synthesized_response.wav")
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 0: initialize test
