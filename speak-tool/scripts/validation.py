@@ -19,7 +19,8 @@ def val1(audio_file):
 
 	with sr.AudioFile(audio_file) as source:
     		audio = r.record(source)
-	with open(os.path.splitext(audio_file)[0].split('_')[0] + '.txt', 'w') as output:
+	print(audio_file)
+	with open(os.path.splitext(audio_file)[0] + '.txt', 'w') as output:
 		try:
 			transc = r.recognize_google(audio)
 			output.write(transc)
