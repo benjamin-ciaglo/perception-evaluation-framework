@@ -62,8 +62,6 @@ def returnAudioFile(audio_file_name):
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/<proctor_name>/<battery_name>/<test_idx>')
 def init_test(proctor_name, battery_name, test_idx):
-	if proctor_name != 'turk':
-		return redirect('/')
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 	print('init: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
