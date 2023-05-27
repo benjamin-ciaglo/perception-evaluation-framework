@@ -180,6 +180,9 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 		print('  workerId:', worker_id, 'redirecting...')
 		return redirect('/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/' + question_idx + arg_string)
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# STEP 4: data collection complete (if applicable, tell mturk that worker is done)
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/<proctor_name>/<battery_name>/evaluate/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def evaluate(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
@@ -191,7 +194,7 @@ def evaluate(proctor_name, battery_name, test_idx, question_idx):
 	)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# STEP 4: data collection complete (if applicable, tell mturk that worker is done)
+# STEP 5: data collection complete (if applicable, tell mturk that worker is done)
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/<proctor_name>/<battery_name>/thanks/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def complete(proctor_name, battery_name, test_idx, question_idx):
@@ -271,7 +274,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 
 
 # --------------------------------------------------------------------------------------
-# STEP 5: submit to mturk
+# STEP 6: submit to mturk
 # --------------------------------------------------------------------------------------
 @app.route('/<proctor_name>/<battery_name>/submit/<test_idx>', methods=['GET', 'POST'])
 def submit(proctor_name, battery_name, test_idx):
