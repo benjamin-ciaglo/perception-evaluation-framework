@@ -209,7 +209,7 @@ def evaluate(proctor_name, battery_name, test_idx, question_idx):
 	print('evaluate: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	audioFile = worker_id + "_" + ass_id + "_synthesized.mp3"
-	audioURL = 'https://percepteval.net' + url_for('static', filename=audioFile)
+	audioURL = 'https://percepteval.net' + '/' + audioFile
 	print(audioURL)
 	submitEvaluation = '/' + proctor_name + '/' + battery_name + '/thanks/' + test_idx + '/' + question_idx + arg_string
 	return render_template(evaluation_template,
