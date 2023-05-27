@@ -33,7 +33,7 @@ with open("app_config.txt", "r+") as config:
 localtime = time.asctime(time.localtime(time.time()))
 print("\n\n----- NEW SESSION %s, ENVIRONMENT: %s ---------------------------" % (localtime, env))
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
 app_dir = os.path.abspath(os.path.dirname(__file__))					# global directory var to make code more readable
 app.secret_key = 'SooperDooperSecret'							# secret key used for session cookies
