@@ -70,6 +70,7 @@ def savefig(filename, fig_list, log=True):
 
 def main(save_location, env, worker_id, ass_id):
     """."""
+    frame_period = 5
     transcript_filename = os.path.join(save_location, env, \
                                        worker_id + "_" + ass_id + "_worker_transcript.txt")
     wav_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
@@ -79,7 +80,8 @@ def main(save_location, env, worker_id, ass_id):
 
     speech_file_name = os.path.join(save_location, env, worker_id + "_" + ass_id + ".mp3")
     x_var, fs_var = sf.read(wav_filename)
-    f0_var = pw.harvest(x_var, fs_var, f0_floor=80.0, f0_ceil=270)[0]
+    f0_var = pw.harvest(x_var, fs_var, f0_floor=80.0, f0_ceil=270,
+        frame_period=frame_period)[0]
 
     f0_no_zeroes = [datapoint for datapoint in f0_var if datapoint > 0]
     mean_f0 = np.mean(f0_no_zeroes)
@@ -132,7 +134,8 @@ def main(save_location, env, worker_id, ass_id):
             speech_text_file.write(text_response)
 
         x_polly, fs_polly = sf.read(speech_file_name)
-        f0_polly = pw.harvest(x_polly, fs_polly, f0_floor=80.0, f0_ceil=270.0)
+        f0_polly = pw.harvest(x_polly, fs_polly, f0_floor=80.0, f0_ceil=270.0,
+            frame_period=frame_period)[0]
 
         bot_adjacent_ipu, human_adjacent_ipu = savefig(os.path.join(save_location, env, \
             worker_id + "_" + ass_id + "_comparison.png"), [f0_polly, f0_var])
