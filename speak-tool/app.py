@@ -227,6 +227,7 @@ def evaluate(proctor_name, battery_name, test_idx, question_idx):
 @app.route('/<proctor_name>/<battery_name>/thanks/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def complete(proctor_name, battery_name, test_idx, question_idx):
 	selected_option = request.form.get('option')
+	print('selected_option: ', selected_option)
 
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 
@@ -236,6 +237,9 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 
 	filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
 
+	score_file = ass_id  + '_score.txt'
+	with open(score_file, 'w') as score_handle:
+		score_handle.write(selected_option + '\n')
 	# check if user is at last question
 	if int(question_idx) != (n-1):
 		print('    workerId:', worker_id, 'not yet done. redirecting to next question...')
