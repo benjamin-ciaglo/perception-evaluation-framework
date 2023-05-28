@@ -2,7 +2,7 @@
 # flask app
 
 # flask libraries
-from flask import Flask, request, render_template, redirect, session, send_from_directory, Response
+from flask import Flask, request, render_template, redirect, session, send_from_directory, Response, abort
 # python/third-party libraries
 import os
 import urllib
@@ -50,7 +50,7 @@ def hello_world():
 @app.route('/<audio_file_name>')
 def returnAudioFile(audio_file_name):
     if not audio_file_name.endswith('.mp3'):
-        return flask.abort(401)
+        return abort(401)
     directory = werkzeug.security.safe_join(save_location, env)
     path = audio_file_name
     return send_from_directory(directory, path)
@@ -65,12 +65,12 @@ def custom_401(error):
 @app.route('/<proctor_name>/<battery_name>/<test_idx>')
 def init_test(proctor_name, battery_name, test_idx):
 	if proctor_name != 'turk':
-		return flask.abort(404)
+		return abort(404)
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 
 	worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
 	if worker_already_started_this_task:
-		return flask.abort(401)
+		return abort(401)
 	else:
 		with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
 			wf.write('Worker started task.')
