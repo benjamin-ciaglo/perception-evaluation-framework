@@ -50,11 +50,10 @@ def hello_world():
 @app.route('/<audio_file_name>')
 def returnAudioFile(audio_file_name):
     if not audio_file_name.endswith('.mp3'):
-		return flask.abort(401)
+        return flask.abort(401)
     directory = werkzeug.security.safe_join(save_location, env)
     path = audio_file_name
-    return send_from_directory(directory,
-		path)
+    return send_from_directory(directory, path)
 
 @app.errorhandler(401)
 def custom_401(error):
