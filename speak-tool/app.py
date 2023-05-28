@@ -69,7 +69,7 @@ def init_test(proctor_name, battery_name, test_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 
 	worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
-	if worker_id in worker_already_started_this_task:
+	if worker_already_started_this_task:
 		return flask.abort(401)
 	else:
 		with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
