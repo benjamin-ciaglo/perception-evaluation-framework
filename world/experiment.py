@@ -142,7 +142,7 @@ def main(save_location, env, worker_id, ass_id):
         bot_adjacent_ipus += [bot_adjacent_ipu]
         human_adjacent_ipus += [human_adjacent_ipu]
 
-    print(static_speech_file_name + ' entrained.. ')
+    print(speech_file_name + ' entrained.. ')
     print('Loop complete. Check /comparison directory.')
 
     file_handle = open(os.path.join(save_location, env, \
