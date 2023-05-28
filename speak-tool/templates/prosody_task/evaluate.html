@@ -12,14 +12,47 @@
 
 			<div class="child">
 			<p><b>Instructions: </b>Please listen to the recording below, then answer the following question.</p>
-			<script type="text/javascript"> function play_given_sound() { document.getElementById('given_sound').play(); }</script>
-			<ol>
-				<li>On a scale of 1 to 7, how trustworthy does the software-based speaker sound to you?</li>
-			</ol>
-			
-			</div>
-			<a href="{{ submitEvaluation }}">
-				<button>Submit Evaluation</button>
-			</a>
+			<audio controls>
+				<source src="{{ audioURL }}" type="audio/mpeg">
+			</audio>
+			<p><b>Question: </b>On a scale of 1 to 7, how friendly does the speaker sound to you?</p>
+			<form method="POST" action="{{ submitEvaluation }}">
+				<label>
+				<input type="radio" name="option" value="7">
+				7 - Extremely friendly
+				</label>
+				<br>
+				<label>
+				<input type="radio" name="option" value="6">
+				6 - Moderately friendly
+				</label>
+				<br>
+				<label>
+				<input type="radio" name="option" value="5">
+				5 - Somewhat friendly
+				</label>
+				<br>
+				<label>
+				<input type="radio" name="option" value="4">
+				4 - Neither friendly nor unfriendly
+				</label>
+				<br>
+				<label>
+				<input type="radio" name="option" value="3">
+				3 - Somewhat unfriendly
+				</label>
+				<br>
+				<label>
+				<input type="radio" name="option" value="1">
+				2 - Moderately unfriendly
+				</label>
+				<br>
+				<label>
+				<input type="radio" name="option" value="1">
+				1 - Extremely unfriendly
+				</label>
+				<br>
+				<input type="submit" value="Submit">
+			</form>
 	</body>
 </html>
