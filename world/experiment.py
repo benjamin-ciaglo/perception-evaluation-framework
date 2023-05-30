@@ -70,15 +70,12 @@ def savefig(filename, fig_list, log=True):
     return bot_adjacent_ipu, human_adjacent_ipu
 
 
-def main(entrainment_features):
+def main(save_location, env, worker_id, ass_id, entrainment_features):
     """."""
     frame_period = 5
-    save_location = './'
-    env = 'sandbox'
-    worker_id = '1'
-    ass_id = '1'
-    transcript_filename = 'A3QU1OSVEYVNLW_39GAF6DQW6PHEWZNO20YCZIPNL8V1Y_worker_recording_transcript.txt'
-    wav_filename = 'A3QU1OSVEYVNLW_34QN5IT0TEGJWVISKQLO6GF77V208W_worker_recording.wav'
+    transcript_filename = os.path.join(save_location, env, \
+        worker_id + "_" + ass_id + "_worker_recording_transcript.txt")
+    wav_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
     print(transcript_filename)
     bot_adjacent_ipus = []
     human_adjacent_ipus = []
@@ -260,5 +257,3 @@ def main(entrainment_features):
             file_handle.write('-------------------\n')
             file_handle.write('Average correlation: ' + str(correlation_coefficient) + '\n')
             file_handle.write('p = ' + str(max_p) + '\n')
-
-main(['volume'])
