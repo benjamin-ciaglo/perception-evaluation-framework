@@ -68,6 +68,9 @@ def init_test(proctor_name, battery_name, test_idx):
 		return abort(404)
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 
+	entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
+	with open(entrainment_config_filename, 'w') as entrainment_handle:
+		entrainment_handle.write("['pitch']")
 	worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
 	if worker_already_started_this_task:
 		return abort(401)
@@ -209,8 +212,11 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 
 	if not session[ass_id + "_" + test_idx + "_" + question_idx]:
 		return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + question_idx + '/1' + arg_string)
-	else:	
-		experiment.main(save_location, env, worker_id, ass_id)
+	else:
+		entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
+		with open(entrainment_config_filename, 'r') as entrainment_handle:
+			entrainment_config = entrainment_handle.readlines()[0]
+		experiment.main(save_location, env, worker_id, ass_id, entrainment_config)
 		print('  workerId:', worker_id, 'redirecting...')
 		return redirect('/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/' + question_idx + arg_string)
 
