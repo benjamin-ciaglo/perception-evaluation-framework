@@ -260,5 +260,3 @@ def main(entrainment_features):
             file_handle.write('-------------------\n')
             file_handle.write('Average correlation: ' + str(correlation_coefficient) + '\n')
             file_handle.write('p = ' + str(max_p) + '\n')
-
-main(['volume'])
