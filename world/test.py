@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
 import pyworld as pw
-from world.polly_wrapper import PollyWrapper
+from polly_wrapper import PollyWrapper
 import boto3
 from pysyllables import get_syllable_count
 
@@ -68,17 +68,23 @@ def savefig(filename, fig_list, log=True):
     return bot_adjacent_ipu, human_adjacent_ipu
 
 
-def main(save_location, env, worker_id, ass_id):
+def main():
     """."""
     frame_period = 5
-    transcript_filename = os.path.join(save_location, env, \
-        worker_id + "_" + ass_id + "_worker_recording_transcript.txt")
-    wav_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
+    save_location = './'
+    env = 'sandbox'
+    worker_id = '1'
+    ass_id = '1'
+    #transcript_filename = os.path.join(save_location, env, \
+    #    worker_id + "_" + ass_id + "_worker_transcript.txt")
+    #wav_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
+    transcript_filename = 'A3QU1OSVEYVNLW_39GAF6DQW6PHEWZNO20YCZIPNL8V1Y_worker_recording_transcript.txt'
+    wav_filename = 'A3QU1OSVEYVNLW_39GAF6DQW6PHEWZNO20YCZIPNL8V1Y_worker_recording.wav'
     print(transcript_filename)
     bot_adjacent_ipus = []
     human_adjacent_ipus = []
 
-    #speech_file_name = os.path.join(save_location, env, worker_id + "_" + ass_id + ".mp3")
+    speech_file_name = os.path.join(save_location, env, worker_id + "_" + ass_id + ".mp3")
     x_var, fs_var = sf.read(wav_filename)
     f0_var = pw.harvest(x_var, fs_var, f0_floor=80.0, f0_ceil=270,
         frame_period=frame_period)[0]
@@ -160,3 +166,5 @@ def main(save_location, env, worker_id, ass_id):
     avg_correlation = pearsonr(bot_raw_vals, human_raw_vals)
     file_handle.write('-------------------\n')
     file_handle.write('Average correlation: ' + str(avg_correlation[0]) + '\n')
+
+main()
