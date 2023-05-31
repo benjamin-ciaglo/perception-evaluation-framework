@@ -4,7 +4,6 @@ import argparse
 import re
 import os
 import librosa
-from pydub import AudioSegment
 from scipy.stats import pearsonr
 from scipy.signal import resample
 
@@ -75,7 +74,7 @@ def main(save_location, env, worker_id, ass_id, entrainment_features):
     frame_period = 5
     transcript_filename = os.path.join(save_location, env, \
         worker_id + "_" + ass_id + "_worker_recording_transcript.txt")
-    wav_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
+    wav_filename = 'A3QU1OSVEYVNLW_34QN5IT0TEGJWVISKQLO6GF77V208W_worker_recording.wav'
     print(transcript_filename)
     bot_adjacent_ipus = []
     human_adjacent_ipus = []
@@ -166,8 +165,12 @@ def main(save_location, env, worker_id, ass_id, entrainment_features):
         file_handle.write('p = ' + str(avg_correlation[1]) + '\n')
     elif entrainment_features[0] == 'volume':
         amplitude, sample_rate = librosa.load(wav_filename)
-
         amplitude_no_zeroes = [datapoint for datapoint in amplitude if datapoint != 0]
+        length = len(amplitude_no_zeroes)
+        average_first_half = np.mean(np.abs(amplitude_no_zeroes[:length//2]))
+        average_second_half = np.mean(np.abs(amplitude_no_zeroes[length//2:]))
+
+        difference = average_second_half - average_first_half
 
         start_index = 0
         text_response = '<speak>'
@@ -181,33 +184,21 @@ def main(save_location, env, worker_id, ass_id, entrainment_features):
         total_syllables_response = sum(syllable_counts_response)
         datapoints_per_syllable_response = len(amplitude_no_zeroes) / total_syllables_response
 
-        db_scale = librosa.amplitude_to_db(amplitude_no_zeroes)
+        gradient = np.linspace(average_second_half - difference, average_second_half, total_syllables_response)
+        prev_mean_amplitude = 0
 
-        prev_amp = 0
-        for i in range(0, len(stripped_split_response)):
-            syllables = syllable_counts_response[i]
-            end_index = start_index + int(syllables * datapoints_per_syllable_response)
-            cur_amp = np.average([datapoint for \
-                datapoint in db_scale[start_index:end_index]])
-            db_diff = cur_amp - prev_amp
-            if prev_amp == 0:
-                amp_tag = 'default'
+        for word, syllables in zip(split_response, syllable_counts_response):
+            word_amplitudes = gradient[:syllables]
+            mean_amplitude = np.mean(word_amplitudes)
+            amplitude_change = mean_amplitude - prev_mean_amplitude
+            volume_level = round(amplitude_change, 6)
+            if volume_level >= 0:
+                text_response += f'<prosody volume="+{volume_level}dB">{word}</prosody>'
             else:
-                amp_tag = round(db_diff, 6)
-            if amp_tag == 'default':
-                amp_tag = 'default'
-            elif amp_tag >= 0:
-                amp_tag = '+' + str(amp_tag) + 'dB'
-            else:
-                amp_tag = str(amp_tag) + 'dB'
-
-            prev_amp = cur_amp
-            text_response += '<prosody volume="' + amp_tag + '">'
-            text_response += split_response[i]
-            text_response += '</prosody>'
-            start_index = end_index
+                text_response += f'<prosody volume="{volume_level}dB">{word}</prosody>'
+            gradient = gradient[syllables:]
+            prev_mean_amplitude = mean_amplitude
         text_response += '</speak>'
-        print(text_response)
         polly_object = PollyWrapper(boto3.client('polly', region_name='us-east-1'), boto3.resource('s3', region_name='us-east-1'))
         results = polly_object.synthesize(text_response, 'standard', 'Joanna', 'mp3', 'en-US', False)
         audio_stream = results[0]
@@ -221,39 +212,4 @@ def main(save_location, env, worker_id, ass_id, entrainment_features):
                 speech_file.write(audio_stream.read())
             with open(speech_text_file_name, 'w', encoding='utf-8') as speech_text_file:
                 speech_text_file.write(text_response)
-
-            mp3_file = speech_file_name
-            wav_file = speech_file_name = os.path.join(save_location, env, \
-                worker_id + "_" + ass_id + "_synthesized.wav")
-            audio = AudioSegment.from_mp3(mp3_file)
-            # Export the audio to WAV format
-            audio.export(wav_file, format="wav")
-            amplitude_polly, sample_rate_polly = librosa.load(wav_file)
-
-            if len(amplitude_polly) > len(amplitude):
-                amplitude = resample(amplitude, len(amplitude_polly))
-            elif len(amplitude) > len(amplitude_polly):
-                amplitude_polly = resample(amplitude_polly, len(amplitude))
-
-            # Find the cross-correlation lag
-            cross_corr = np.correlate(amplitude, amplitude_polly, mode='full')
-            lag = np.argmax(cross_corr) - (len(amplitude) - 1)
-
-            # Adjust the second audio file based on the lag
-            adjusted_amplitude_polly = np.roll(amplitude_polly, -lag)
-
-            bot_adjacent_ipu, human_adjacent_ipu = savefig(os.path.join(save_location, env, \
-                worker_id + "_" + ass_id + "_comparison.png"), [adjusted_amplitude_polly, amplitude])
-            
-            print(speech_file_name + ' entrained.. ')
             print('Loop complete. Check /comparison directory.')
-
-            # Calculate the Pearson correlation coefficient
-            correlation_coefficient, max_p = pearsonr(bot_adjacent_ipu, human_adjacent_ipu)
-
-            file_handle = open(os.path.join(save_location, env, \
-                worker_id + "_" + ass_id + "_correlation.txt"), 'w', encoding='utf-8')
-            file_handle.write(str(correlation_coefficient) + '\n')
-            file_handle.write('-------------------\n')
-            file_handle.write('Average correlation: ' + str(correlation_coefficient) + '\n')
-            file_handle.write('p = ' + str(max_p) + '\n')
