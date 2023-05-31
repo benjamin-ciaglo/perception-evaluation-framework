@@ -91,24 +91,24 @@ def init_test(proctor_name, battery_name, test_idx):
 		return abort(404)
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 
-	message = pop_sqs_item()
-	entrainment_features = message['Body']
-	print(save_location, env, worker_id, ass_id)
-	entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
-	with open(entrainment_config_filename, 'w') as entrainment_handle:
-		entrainment_handle.write(entrainment_features)
+	if (worker_id is not None):
+		message = pop_sqs_item()
+		entrainment_features = message['Body']
+		entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
+		with open(entrainment_config_filename, 'w') as entrainment_handle:
+			entrainment_handle.write(entrainment_features)
 
-	worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
-	if worker_already_started_this_task:
-		return abort(401)
-	else:
-		with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
-			wf.write('Worker started task.')
-	print('init: ')
-	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
-	print('submit_path: ', submit_path, ' arg_string: ', arg_string)
-	session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
-	session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
+		worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
+		if worker_already_started_this_task:
+			return abort(401)
+		else:
+			with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
+				wf.write('Worker started task.')
+		print('init: ')
+		print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
+		print('submit_path: ', submit_path, ' arg_string: ', arg_string)
+		session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
+		session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
 	return redirect('/' + 'recruitment' + '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -134,9 +134,18 @@ def consent(proctor_name, battery_name, test_idx):
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	# redirect worker to first question within HIT, multiple_attempts_true = 0 (false)
 	nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
-	return render_template(consent_template,
+	if worker_id is not None:
+		return render_template(consent_template,
 			nextPage=nextPage
 		)
+	else:
+		return render_template('base/cookie_error.html',
+			assignmentId=ass_id,
+			hitId=hit_id,
+			workerId=worker_id,
+			turkSubmitTo=submit_path,
+			retrySubmitUrl="/{}/{}/record-voice/{}/{}/{}".format(proctor_name, battery_name,
+				test_idx, question_idx, multiple_attempts_true))
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 1: record user input
