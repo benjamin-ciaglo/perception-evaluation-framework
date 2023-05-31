@@ -342,7 +342,7 @@ def perform_analysis(worker_id, ass_id, save_location, env, response, wav_filena
 def main(save_location, env, worker_id, ass_id, entrainment_features):
     """Performs speech analysis."""
     response = generate_response()
-    wav_filename = 'A3QU1OSVEYVNLW_34QN5IT0TEGJWVISKQLO6GF77V208W_worker_recording.wav'
+    wav_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
     perform_analysis(worker_id, ass_id, save_location, env, response, wav_filename, entrainment_features)
 
 #main('./', 'sandbox', '1', '1', ['entrain-pitch', 'entrain-volume'])
