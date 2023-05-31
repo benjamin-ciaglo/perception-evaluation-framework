@@ -49,7 +49,7 @@ def hello_world():
 
 @app.route('/<audio_file_name>')
 def returnAudioFile(audio_file_name):
-    if not audio_file_name.endswith('.mp3'):
+    if not audio_file_name.endswith('.wav'):
         return abort(401)
     directory = werkzeug.security.safe_join(save_location, env)
     path = audio_file_name
@@ -228,7 +228,7 @@ def evaluate(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 	print('evaluate: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
-	audioFile = worker_id + "_" + ass_id + "_synthesized.mp3"
+	audioFile = worker_id + "_" + ass_id + "_synthesized.wav"
 	audioURL = 'https://percepteval.net' + '/' + audioFile
 	print(audioURL)
 	submitEvaluation = '/' + proctor_name + '/' + battery_name + '/thanks/' + test_idx + '/' + question_idx + arg_string

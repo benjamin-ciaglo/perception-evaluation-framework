@@ -1,3 +1,5 @@
 *.pyc
 __pycache__
 speak_amt_prosody
+*.wav
+*.mp3
