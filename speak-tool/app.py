@@ -93,6 +93,7 @@ def init_test(proctor_name, battery_name, test_idx):
 
 	message = pop_sqs_item()
 	entrainment_features = message['Body']
+	print(save_location, env, worker_id, ass_id)
 	entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
 	with open(entrainment_config_filename, 'w') as entrainment_handle:
 		entrainment_handle.write(entrainment_features)
