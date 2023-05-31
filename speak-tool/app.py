@@ -145,7 +145,7 @@ def consent(proctor_name, battery_name, test_idx):
 			workerId=worker_id,
 			turkSubmitTo=submit_path,
 			retrySubmitUrl="/recruitment/{}/{}/record-voice/{}/".format(proctor_name, battery_name,
-				test_idx))
+				test_idx) + arg_string)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 1: record user input
