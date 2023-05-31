@@ -7,6 +7,8 @@ import argparse
 import json
 import os.path
 import uuid
+import json
+import boto3
 
 # ---------------------------------------------------------------------------------------
 # deploy HIT
@@ -28,9 +30,9 @@ def deployHITs(client, preview_url, logdir):
     # HIT metadata
     # -------------------------------------------------------------------------------
     TaskAttributes = {
-        'MaxAssignments': 1,                 
-        'LifetimeInSeconds': 15*60,           
-        'AssignmentDurationInSeconds': 15*60, 
+        'MaxAssignments': 27,
+        'LifetimeInSeconds': 30*60*60*24,
+        'AssignmentDurationInSeconds': 10*60,
         'Reward': '5.00',
         'Title': 'Record yourself describing this week\'s weather',
         'Keywords': 'sound, label, read, record, voice',
@@ -111,6 +113,35 @@ def deployHITs(client, preview_url, logdir):
         json.dump(log_dict, fp)
 
     print('HIT logfile saved at %s' % logfile)
+
+def deploy_sqs_items():
+    sqs = boto3.client('sqs', region_name='us-east-1')
+    queue_url = 'https://sqs.us-east-1.amazonaws.com/180367849334/percept_eval_deployment_queue'
+    list1 = ['entrain-pitch', 'entrain-volume']
+    list2 = ['entrain-pitch', 'disentrain-volume']
+    list3 = ['entrain-pitch']
+    list4 = ['disentrain-pitch', 'entrain-volume']
+    list5 = ['disentrain-pitch', 'disentrain-volume']
+    list6 = ['disentrain-pitch']
+    list7 = ['entrain-volume']
+    list8 = ['disentrain-volume']
+    list9 = []
+    python_lists = [list1, list2, list3, list4, list5, list6, list7, list8, list9]
+
+    sqs = boto3.client('sqs')
+
+    response = sqs.list_queues()
+
+    print(response['QueueUrls'])
+
+    for python_list in python_lists:
+        json_string = json.dumps(python_list)
+        response = sqs.send_message(
+            QueueUrl=queue_url,
+            MessageBody=json_string
+        )
+        print(response)
+        
 # ---------------------------------------------------------------------------------------
 # main
 # ---------------------------------------------------------------------------------------
@@ -125,5 +156,9 @@ if __name__ == "__main__":
     # initiate connection to turk server
     client, preview_url = init(region, profile, env)
 
+    # -------------------
+    # deploy SQS queue items - author: ben ciaglo
+    deploy_sqs_items()
+    # -------------------
     # deploy HITs
     deployHITs(client, preview_url, args.logdir)

@@ -9,6 +9,7 @@ import urllib
 import time
 import werkzeug
 import geoip2.database
+import boto3
 # helpers
 import scripts
 
@@ -59,6 +60,28 @@ def returnAudioFile(audio_file_name):
 def custom_401(error):
     return Response('You have already attempted this task, or are trying to access an unauthorized resource. Please contact an administrator if you believe you should not be receiving this message.', 401, {})
 
+def pop_sqs_item():
+    sqs = boto3.client('sqs')
+    queue_url = 'https://sqs.us-east-1.amazonaws.com/180367849334/percept_eval_deployment_queue'
+    response = sqs.receive_message(
+        QueueUrl=queue_url,
+        AttributeNames=[
+            'All'
+        ],
+        MaxNumberOfMessages=1,
+    )
+    if 'Messages' in response:
+        message = response['Messages'][0]
+        receipt_handle = message['ReceiptHandle']
+        sqs.delete_message(
+            QueueUrl=queue_url,
+            ReceiptHandle=receipt_handle
+        )
+        print('Received and deleted message: %s' % message)
+    else:
+        print('No messages in queue.')
+    return message
+
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 0: initialize test
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -68,9 +91,12 @@ def init_test(proctor_name, battery_name, test_idx):
 		return abort(404)
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 
+	message = pop_sqs_item()
+	entrainment_features = message['Body']
 	entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
 	with open(entrainment_config_filename, 'w') as entrainment_handle:
-		entrainment_handle.write("['pitch']")
+		entrainment_handle.write(entrainment_features)
+
 	worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
 	if worker_already_started_this_task:
 		return abort(401)
