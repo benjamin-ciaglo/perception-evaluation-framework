@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
 import pyworld as pw
-from polly_wrapper import PollyWrapper
+from world.polly_wrapper import PollyWrapper
 import boto3
 from pysyllables import get_syllable_count
 
