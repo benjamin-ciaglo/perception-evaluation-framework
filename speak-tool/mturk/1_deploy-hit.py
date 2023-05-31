@@ -78,7 +78,7 @@ def deployHITs(client, preview_url, start_index, end_index, logdir):
     num_launched = 0
 
     # loop through each sound
-    for i in range(start_index,end_index+1):
+    for i in range(start_index,end_index):
         # prepare xml payload customized w/test idx
         question_enc = question_xml.replace('${idx}',str(i))
 
@@ -125,7 +125,9 @@ def deploy_sqs_items():
     list7 = ['entrain-volume']
     list8 = ['disentrain-volume']
     list9 = []
-    python_lists = [list1, list2, list3, list4, list5, list6, list7, list8, list9]
+    python_lists = [list1, list2, list3, list4, list5, list6, list7, list8, list9, \
+                    list1, list2, list3, list4, list5, list6, list7, list8, list9, \
+                    list1, list2, list3, list4, list5, list6, list7, list8, list9]
 
     sqs = boto3.client('sqs')
 
