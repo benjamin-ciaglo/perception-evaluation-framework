@@ -144,7 +144,7 @@ def consent(proctor_name, battery_name, test_idx):
 			hitId=hit_id,
 			workerId=worker_id,
 			turkSubmitTo=submit_path,
-			retrySubmitUrl='/' + 'recruitment' + '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string)
+			retrySubmitUrl='/turk/prosody_task/1')
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 1: record user input
