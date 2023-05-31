@@ -61,7 +61,7 @@ def custom_401(error):
     return Response('You have already attempted this task, or are trying to access an unauthorized resource. Please contact an administrator if you believe you should not be receiving this message.', 401, {})
 
 def pop_sqs_item():
-    sqs = boto3.client('sqs')
+    sqs = boto3.client('sqs', region_name='us-east-1')
     queue_url = 'https://sqs.us-east-1.amazonaws.com/180367849334/percept_eval_deployment_queue'
     response = sqs.receive_message(
         QueueUrl=queue_url,

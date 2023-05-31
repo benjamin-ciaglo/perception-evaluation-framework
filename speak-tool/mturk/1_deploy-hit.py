@@ -8,7 +8,6 @@ import json
 import os.path
 import uuid
 import json
-import boto3
 
 # ---------------------------------------------------------------------------------------
 # deploy HIT
