@@ -136,15 +136,16 @@ def consent(proctor_name, battery_name, test_idx):
 	nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
 	if worker_id is not None:
 		return render_template(consent_template,
-			nextPage=nextPage
-		)
+				nextPage=nextPage
+			)
 	else:
 		return render_template('base/cookie_error.html',
 			assignmentId=ass_id,
 			hitId=hit_id,
 			workerId=worker_id,
 			turkSubmitTo=submit_path,
-			retrySubmitUrl='/turk/prosody_task/1')
+			retrySubmitUrl="/recruitment/{}/{}/record-voice/{}/".format(proctor_name, battery_name,
+				test_idx))
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 1: record user input
