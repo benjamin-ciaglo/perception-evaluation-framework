@@ -13,7 +13,7 @@ import json
 # deploy HIT
 # ---------------------------------------------------------------------------------------
 
-def deployHITs(client, preview_url, logdir):
+def deployHITs(client, preview_url, start_index, end_index, logdir):
 
     file_uuid = uuid.uuid4()
     logfile = os.path.join(logdir, 'launched_%s.json' % (file_uuid))
@@ -77,25 +77,25 @@ def deployHITs(client, preview_url, logdir):
 
     num_launched = 0
 
-    # prepare xml payload customized w/test idx
-    question_enc = question_xml.replace('${idx}',str(1))
+    # loop through each sound
+    for i in range(start_index,end_index+1):
+        # prepare xml payload customized w/test idx
+        question_enc = question_xml.replace('${idx}',str(i))
 
-    # create hit using xml payload and task attributes
-    hit = client.create_hit(**TaskAttributes,Question=question_enc)
+        # create hit using xml payload and task attributes
+        hit = client.create_hit(**TaskAttributes,Question=question_enc)
 
-    # save HIT type id for later
-    hit_type_id = hit['HIT']['HITTypeId']
+        # save HIT type id for later
+        hit_type_id = hit['HIT']['HITTypeId']
 
-    # save hit_id-to-test-idx mappings
-    hit_id_to_idx[hit['HIT']['HITId']] = 1
+        # save hit_id-to-test-idx mappings
+        hit_id_to_idx[hit['HIT']['HITId']] = i
 
-    launched_hits.append(hit)
+        launched_hits.append(hit)
 
-    num_launched += 1
+        num_launched += 1
 
-    if num_launched % 20 == 0:
-        print('Launched %d HITs...' % num_launched)
-
+    print('Launched %d HITs...' % num_launched)
     print(' ')
 
     # print hit_id-to-sound mappings
@@ -160,4 +160,4 @@ if __name__ == "__main__":
     deploy_sqs_items()
     # -------------------
     # deploy HITs
-    deployHITs(client, preview_url, args.logdir)
+    deployHITs(client, preview_url, 0, 27, args.logdir)
