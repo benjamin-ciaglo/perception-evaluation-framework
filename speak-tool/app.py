@@ -139,13 +139,7 @@ def consent(proctor_name, battery_name, test_idx):
 				nextPage=nextPage
 			)
 	else:
-		return render_template('base/cookie_error.html',
-			assignmentId=ass_id,
-			hitId=hit_id,
-			workerId=worker_id,
-			turkSubmitTo=submit_path,
-			retrySubmitUrl="/recruitment/{}/{}/record-voice/{}/".format(proctor_name, battery_name,
-				test_idx) + arg_string)
+		return redirect('/' + 'recruitment' + '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 1: record user input
