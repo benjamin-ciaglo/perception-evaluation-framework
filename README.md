@@ -1,4 +1,4 @@
-# perception-evaluation-framework
+# Developing a Framework for Metrics and Evaluation of the Impact of Acoustic-Prosodic Features in Synthesized Speech on Listener Perception in Dyadic Interactions
 
 This repository is for a UW CLMS Master's Thesis. The entire paper will be linked once complete. 
 
