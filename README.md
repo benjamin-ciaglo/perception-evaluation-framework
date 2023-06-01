@@ -1,8 +1,8 @@
 # perception-evaluation-framework
 
-This repository is for a UW CLMS Master's Thesis. 
+This repository is for a UW CLMS Master's Thesis. The entire paper will be linked once complete. 
 
-It combines, and makes interoperable with each other, two tools, namely:
+In its current form, this repo combines, and makes interoperable with each other, two tools, namely:
 
 https://github.com/JeremyCCHsu/Python-Wrapper-for-World-Vocoder
 
