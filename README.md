@@ -4,9 +4,9 @@ This repository is for a UW CLMS Master's Thesis. The entire paper will be linke
 
 The purpose of this project is to create standard framework for researchers to measure the effect of acoustic-prosodic features of speech on perceptual traits like trustworthiness, rapport, etc... 
 
-Repositories referenced below are contained in subdirectories of this repo in heavily modified forms. 
+Repositories referenced below are contained in subdirectories of this repo in heavily modified forms. As deemed appropriate, these two repositories (and possibly more in the future) need to be forked, and converted to submodules of this project in order to retain their original commit histories, and also to ensure future updates are possible assuming they are maintained by their respective authors. In the meantime, these repositories have been copied and their licenses retained.
 
-In its current form, this repo combines, and makes interoperable with each other, two tools, namely: https://github.com/JeremyCCHsu/Python-Wrapper-for-World-Vocoder, which is an demo example repo of: https://github.com/mmorise/World, cited as:
+In its current form, this repo modifies, combines, and makes interoperable with each other, two tools, namely: https://github.com/JeremyCCHsu/Python-Wrapper-for-World-Vocoder, which is an demo example repo of: https://github.com/mmorise/World, cited as:
 
 M. Morise, F. Yokomori, and K. Ozawa: WORLD: a vocoder-based high-quality speech synthesis system for real-time applications, IEICE transactions on information and systems, vol. E99-D, no. 7, pp. 1877-1884, 2016. https://www.jstage.jst.go.jp/article/transinf/E99.D/7/E99.D_2015EDP7457/_article
 
