@@ -20,7 +20,7 @@ https://github.com/soupdtag/speak-tool which is the repo for:
 
 Song, Christopher et al. “Speak: A Toolkit Using Amazon Mechanical Turk to Collect and Validate Speech Audio Recordings.” International Conference on Language Resources and Evaluation (2022).
 
-All other references:
+# All other references:
 
 Benus, S., Trnka, M., Kuric, E., Martak, L.S., Gravano, A., Hirschberg, J., & Levitan, R. (2018). Prosodic entrainment and trust in human-computer interaction. Speech Prosody 2018.
 
