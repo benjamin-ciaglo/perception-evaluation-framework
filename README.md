@@ -2,6 +2,10 @@
 
 This repository is for a UW CLMS Master's Thesis. The entire paper will be linked once complete. 
 
+The purpose of this project is to create standard framework for researchers to measure the effect of acoustic-prosodic features of speech on perceptual traits like trustworthiness, rapport, etc... 
+
+Repositories referenced below are contained in subdirectories of this repo in heavily modified forms. 
+
 In its current form, this repo combines, and makes interoperable with each other, two tools, namely:
 
 https://github.com/JeremyCCHsu/Python-Wrapper-for-World-Vocoder
