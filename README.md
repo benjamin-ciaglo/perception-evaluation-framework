@@ -6,11 +6,7 @@ The purpose of this project is to create standard framework for researchers to m
 
 Repositories referenced below are contained in subdirectories of this repo in heavily modified forms. 
 
-In its current form, this repo combines, and makes interoperable with each other, two tools, namely:
-
-https://github.com/JeremyCCHsu/Python-Wrapper-for-World-Vocoder
-
-which is an demo example repo of: https://github.com/mmorise/World, cited as:
+In its current form, this repo combines, and makes interoperable with each other, two tools, namely: https://github.com/JeremyCCHsu/Python-Wrapper-for-World-Vocoder, which is an demo example repo of: https://github.com/mmorise/World, cited as:
 
 M. Morise, F. Yokomori, and K. Ozawa: WORLD: a vocoder-based high-quality speech synthesis system for real-time applications, IEICE transactions on information and systems, vol. E99-D, no. 7, pp. 1877-1884, 2016. https://www.jstage.jst.go.jp/article/transinf/E99.D/7/E99.D_2015EDP7457/_article
 
@@ -18,9 +14,7 @@ M. Morise: D4C, a band-aperiodicity estimator for high-quality speech synthesis,
 
 M. Morise: Harvest: A high-performance fundamental frequency estimator from speech signals, in Proc. INTERSPEECH 2017, pp. 2321–2325, 2017. http://www.isca-speech.org/archive/Interspeech_2017/abstracts/0068.html
 
-and 
-
-https://github.com/soupdtag/speak-tool which is the repo for: 
+and https://github.com/soupdtag/speak-tool which is the repo for: 
 
 Song, Christopher et al. “Speak: A Toolkit Using Amazon Mechanical Turk to Collect and Validate Speech Audio Recordings.” International Conference on Language Resources and Evaluation (2022).
 
