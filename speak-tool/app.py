@@ -102,7 +102,7 @@ def init_test(proctor_name, battery_name, test_idx):
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'r') as rf:
 				session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
-				session[ass_id + "_" + test_idx + "_starttime"] = rf.readlines[0].strip('\n')
+				session[ass_id + "_" + test_idx + "_starttime"] = float(rf.readlines[0].strip('\n'))
 		elif worker_already_started_this_task:
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
 				prev_ass_id = rf.readline().strip('\n')
@@ -111,7 +111,7 @@ def init_test(proctor_name, battery_name, test_idx):
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'r') as rf:
 				session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
-				session[ass_id + "_" + test_idx + "_starttime"] = rf.readlines[0].strip('\n')
+				session[ass_id + "_" + test_idx + "_starttime"] = float(rf.readlines[0].strip('\n'))
 		else:
 			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 			print('init: ')
@@ -121,7 +121,7 @@ def init_test(proctor_name, battery_name, test_idx):
 			session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'w') as wf:
-				wf.write(session[ass_id + "_" + test_idx + "_starttime"])
+				wf.write(str(session[ass_id + "_" + test_idx + "_starttime"]))
 	else:
 		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 	return redirect(nextPage)
