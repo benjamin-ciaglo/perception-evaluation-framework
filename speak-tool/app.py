@@ -11,6 +11,7 @@ import werkzeug
 import geoip2.database
 import boto3
 import re
+import pickle
 # helpers
 import scripts
 from ast import literal_eval
@@ -110,28 +111,25 @@ def init_test(proctor_name, battery_name, test_idx):
 			arg_string = re.sub(r'assignmentId=.*?&', 'assignmentId=' + prev_ass_id + '&', arg_string)
 			nextPage = '/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/0' + arg_string
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
-			with open(session_file, 'r') as rf:
-				session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
-				session[ass_id + "_" + test_idx + "_starttime"] = float(rf.readlines()[0].strip('\n'))
+			with open(session_file, 'rb') as file:
+				session = pickle.load(file)
 		elif worker_already_started_this_task:
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
 				prev_ass_id = rf.readline().strip('\n')
 			arg_string = re.sub(r'assignmentId=.*?&', 'assignmentId=' + prev_ass_id + '&', arg_string)
 			nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/1' + arg_string
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
-			with open(session_file, 'r') as rf:
-				session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
-				session[ass_id + "_" + test_idx + "_starttime"] = float(rf.readlines()[0].strip('\n'))
+			with open(session_file, 'rb') as file:
+				session = pickle.load(file)
 		else:
 			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 			print('init: ')
 			print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 			print('submit_path: ', submit_path, ' arg_string: ', arg_string)
-			session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
-			session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
+			session[ass_id + "_starttime"] = time.time() # start task timer
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
-			with open(session_file, 'w') as wf:
-				wf.write(str(session[ass_id + "_" + test_idx + "_starttime"]))
+			with open(session_file, 'wb') as file:
+				pickle.dump(session, file)
 	else:
 		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 	return redirect(nextPage)
@@ -146,6 +144,9 @@ def consent(proctor_name, battery_name, test_idx):
 	print('consent: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	# redirect worker to first question within HIT, multiple_attempts_true = 0 (false)
+	session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+	with open(session_file, 'wb') as file:
+		pickle.dump(session, file)
 	if worker_id is not None:
 		nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
 		return render_template(recruitment_and_consent_template,
@@ -185,13 +186,15 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 	scripts.print_row('question:', question_idx)
 
 	is_preview = (ass_id is None)
-	if not is_preview and not (ass_id + "_" + test_idx + "_starttime" in session):
+	if not is_preview and not (ass_id + "_starttime" in session):
 		session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
-		with open(session_file, 'r') as rf:
-			session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
-			session[ass_id + "_" + test_idx + "_starttime"] = float(rf.readlines()[0].strip('\n'))
+		with open(session_file, 'rb') as file:
+			session = pickle.load(file)
 	
-	if (not is_preview) and (ass_id + "_" + test_idx + "_starttime" in session):
+	session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+	with open(session_file, 'wb') as file:
+		pickle.dump(session, file)
+	if (not is_preview) and (ass_id + "_starttime" in session):
 		is_not_preview = not is_preview
 		return render_template(record_template,
 			error=multiple_attempts_true,
@@ -240,6 +243,10 @@ def upload(proctor_name, battery_name, test_idx, question_idx):
 	#sf.write(filename, y, sr)	
 	print('  workerId:', worker_id, '...upload complete.')
 
+	session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+	with open(session_file, 'wb') as file:
+		pickle.dump(session, file)
+
 	return ('', 202)
 
 
@@ -270,11 +277,15 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 	test_soundlength = scripts.val1b(filename, 5)
 	print('    val1a (numwords): ' + str(test_numwords))
 	print('    val1b (soundlength): ' + str(test_soundlength))
-	#session[ass_id + "_" + test_idx + "_" + question_idx] = test_numwords & test_soundlength# & (test_wer < 0.2)
-	session[ass_id + "_" + test_idx + "_" + question_idx] = test_soundlength & test_numwords & test_soundlength
-	print("    worker passes this task:",session[ass_id + "_" + test_idx + "_" + question_idx])
+	#session[ass_id + "_" + question_idx] = test_numwords & test_soundlength# & (test_wer < 0.2)
+	session[ass_id + "_" + question_idx] = test_soundlength & test_numwords & test_soundlength
+	print("    worker passes this task:",session[ass_id + "_" + question_idx])
 
-	if not session[ass_id + "_" + test_idx + "_" + question_idx]:
+	session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+	with open(session_file, 'wb') as file:
+		pickle.dump(session, file)
+
+	if not session[ass_id + "_" + question_idx]:
 		return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + question_idx + '/1' + arg_string)
 	else:
 		entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
@@ -324,6 +335,10 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 	# final thanks + instructions for worker
 	print('    workerId:', worker_id, 'done with all questions for test', test_idx,'of',battery_name + '.')	
 
+	session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+	with open(session_file, 'wb') as file:
+		pickle.dump(session, file)
+
 	if (proctor_name == 'turk'):
 		print('  ---- task complete -------------')
 		###
@@ -341,7 +356,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 			worker_region = "N/A"
 			worker_city = "N/A"
 
-		elapsed_time = time.time() - session.get(ass_id + "_" + test_idx + "_starttime", 0)
+		elapsed_time = time.time() - session.get(ass_id + "_starttime", 0)
 		probably_not_fraud = True if (elapsed_time > 10) else False
 
 		payload = {	'hitId':hit_id, 'assignmentId':ass_id, 'workerId':worker_id, 'turkSubmitTo':submit_link, 'environment':env,
