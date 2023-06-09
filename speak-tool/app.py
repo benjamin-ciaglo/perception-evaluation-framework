@@ -93,12 +93,12 @@ def init_test(proctor_name, battery_name, test_idx):
 
 	if (worker_id is not None):
 		worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
-		with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
-			prev_ass_id = rf.readline().strip('\n')
 		worker_already_completed_this_task = os.path.exists(os.path.join(save_location, env, worker_id + "_" + ass_id + "_" + "score" ".txt"))
 		if worker_already_completed_this_task:
 			return abort(401)
 		elif worker_already_started_this_task:
+			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
+				prev_ass_id = rf.readline().strip('\n')
 			ass_id = prev_ass_id
 		else:
 			with open(os.path.join(save_location, env, worker_id + "_" + ass_id + ".txt"), 'w') as wf:
