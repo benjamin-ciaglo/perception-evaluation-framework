@@ -111,7 +111,7 @@ def init_test(proctor_name, battery_name, test_idx):
 			nextPage = '/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/0' + arg_string
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'r') as rf:
-				session_file.clear()
+				session.clear()
 				session[ass_id + "_starttime"] = float(rf.readlines()[0].strip('\n'))
 		elif worker_already_started_this_task:
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
@@ -120,7 +120,7 @@ def init_test(proctor_name, battery_name, test_idx):
 			nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/1' + arg_string
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'r') as rf:
-				session_file.clear()
+				session.clear()
 				session[ass_id + "_starttime"] = float(rf.readlines()[0].strip('\n'))
 		else:
 			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
