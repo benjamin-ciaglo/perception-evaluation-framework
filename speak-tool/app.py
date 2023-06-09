@@ -115,9 +115,6 @@ def init_test(proctor_name, battery_name, test_idx):
 		session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
 		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
 		return redirect(nextPage)
-	else:
-		nextPage = '/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
-		return redirect(nextPage)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 0b: show recruitment/consent info, give test
