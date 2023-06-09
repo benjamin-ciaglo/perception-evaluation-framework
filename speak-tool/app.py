@@ -144,10 +144,10 @@ def consent(proctor_name, battery_name, test_idx):
 	print('consent: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	# redirect worker to first question within HIT, multiple_attempts_true = 0 (false)
-	session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
-	with open(session_file, 'wb') as file:
-		pickle.dump(session, file)
 	if worker_id is not None:
+		session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+		with open(session_file, 'wb') as file:
+			pickle.dump(session, file)
 		nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
 		return render_template(recruitment_and_consent_template,
 				nextPage=nextPage
