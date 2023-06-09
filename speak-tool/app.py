@@ -281,7 +281,10 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 		with open(entrainment_config_filename, 'r') as entrainment_handle:
 			entrainment_config = entrainment_handle.readlines()[0].strip('\n')
 		entrainment_config = literal_eval(entrainment_config)
-		experiment.main(save_location, env, worker_id, ass_id, entrainment_config)
+		try:
+			experiment.main(save_location, env, worker_id, ass_id, entrainment_config)
+		except Exception as e:
+			return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + question_idx + '/1' + arg_string)
 		print('  workerId:', worker_id, 'redirecting...')
 		return redirect('/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/' + question_idx + arg_string)
 
