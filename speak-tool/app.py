@@ -125,8 +125,13 @@ def consent(proctor_name, battery_name, test_idx):
 	print('consent: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	# redirect worker to first question within HIT, multiple_attempts_true = 0 (false)
-	nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
 	if worker_id is not None:
+		nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
+		return render_template(recruitment_and_consent_template,
+				nextPage=nextPage
+			)
+	else:
+		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
 		return render_template(recruitment_and_consent_template,
 				nextPage=nextPage
 			)
