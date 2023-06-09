@@ -103,34 +103,34 @@ def init_test(proctor_name, battery_name, test_idx):
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
 				prev_ass_id = rf.readline().strip('\n')
 			ass_id = prev_ass_id
-			nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
+			nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0/1' + arg_string
 		else:
-			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
+			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 		print('init: ')
 		print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 		print('submit_path: ', submit_path, ' arg_string: ', arg_string)
 		session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
 		session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
 	else:
-		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
+		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 	return redirect(nextPage)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 0b: show recruitment/consent info, give test
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@app.route('/consent/<proctor_name>/<battery_name>/record-voice/<test_idx>')
+@app.route('/consent/<proctor_name>/<battery_name>/<test_idx>')
 def consent(proctor_name, battery_name, test_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 	print('consent: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	# redirect worker to first question within HIT, multiple_attempts_true = 0 (false)
 	if worker_id is not None:
-		nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
+		nextPage = '/' + proctor_name + '/' + battery_name + '/' + test_idx + '/0/0' + arg_string
 		return render_template(recruitment_and_consent_template,
 				nextPage=nextPage
 			)
 	else:
-		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
+		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 		return render_template(recruitment_and_consent_template,
 				nextPage=nextPage
 			)
