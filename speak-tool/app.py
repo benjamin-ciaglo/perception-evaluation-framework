@@ -112,7 +112,8 @@ def init_test(proctor_name, battery_name, test_idx):
 			nextPage = '/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/0' + arg_string
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'rb') as file:
-				session = pickle.load(file)
+				session_data = pickle.load(file)
+				session.update(session_data)
 		elif worker_already_started_this_task:
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
 				prev_ass_id = rf.readline().strip('\n')
@@ -120,7 +121,8 @@ def init_test(proctor_name, battery_name, test_idx):
 			nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/1' + arg_string
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'rb') as file:
-				session = pickle.load(file)
+				session_data = pickle.load(file)
+				session.update(session_data)
 		else:
 			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 			print('init: ')
@@ -130,7 +132,7 @@ def init_test(proctor_name, battery_name, test_idx):
 			session[ass_id + "_starttime"] = time.time() # start task timer
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'wb') as file:
-				pickle.dump(session, file)
+				pickle.dump(dict(session), file)
 	else:
 		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 	return redirect(nextPage)
@@ -148,7 +150,7 @@ def consent(proctor_name, battery_name, test_idx):
 	if worker_id is not None:
 		session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 		with open(session_file, 'wb') as file:
-			pickle.dump(session, file)
+			pickle.dump(dict(session), file)
 		nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
 		return render_template(recruitment_and_consent_template,
 				nextPage=nextPage
@@ -190,11 +192,12 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 	if not is_preview and not (ass_id + "_starttime" in session):
 		session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 		with open(session_file, 'rb') as file:
-			session = pickle.load(file)
+			session_data = pickle.load(file)
+			session.update(session_data)
 	
 	session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 	with open(session_file, 'wb') as file:
-		pickle.dump(session, file)
+		pickle.dump(dict(session), file)
 	if (not is_preview) and (ass_id + "_starttime" in session):
 		is_not_preview = not is_preview
 		return render_template(record_template,
@@ -246,7 +249,7 @@ def upload(proctor_name, battery_name, test_idx, question_idx):
 
 	session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 	with open(session_file, 'wb') as file:
-		pickle.dump(session, file)
+		pickle.dump(dict(session), file)
 
 	return ('', 202)
 
@@ -284,7 +287,7 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 
 	session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 	with open(session_file, 'wb') as file:
-		pickle.dump(session, file)
+		pickle.dump(dict(session), file)
 
 	if not session[ass_id + "_" + question_idx]:
 		return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + question_idx + '/1' + arg_string)
@@ -338,7 +341,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 
 	session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 	with open(session_file, 'wb') as file:
-		pickle.dump(session, file)
+		pickle.dump(dict(session), file)
 
 	if (proctor_name == 'turk'):
 		print('  ---- task complete -------------')
