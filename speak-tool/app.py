@@ -101,7 +101,7 @@ def init_test(proctor_name, battery_name, test_idx):
 				prev_ass_id = rf.readline().strip('\n')
 			ass_id = prev_ass_id
 		else:
-			with open(os.path.join(save_location, env, worker_id + "_" + ass_id + ".txt"), 'w') as wf:
+			with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
 				wf.write(ass_id)
 			message = pop_sqs_item()
 			entrainment_features = message['Body']
