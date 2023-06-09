@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
 import pyworld as pw
-from world.polly_wrapper import PollyWrapper
+from polly_wrapper import PollyWrapper
 import boto3
 from pysyllables import get_syllable_count
 
@@ -77,10 +77,8 @@ def save_figure(filename, fig_list, log=True):
 
 def analyze_speech_pitch(worker_id, ass_id, save_location, env, response, wav_filename, frame_period, entrain=True):
     x_var, fs_var = sf.read(wav_filename)
-    if not entrain:
-        x_var = x_var[::-1]
-    x_var_contiguous = np.ascontiguousarray(x_var)
-    f0_var = pw.harvest(x_var_contiguous, fs_var, f0_floor=80.0, f0_ceil=270, frame_period=frame_period)[0]
+    
+    f0_var = pw.harvest(x_var, fs_var, f0_floor=80.0, f0_ceil=270, frame_period=frame_period)[0]
     f0_no_zeroes = [datapoint for datapoint in f0_var if datapoint > 0]
     mean_f0 = np.mean(f0_no_zeroes)
     f0_diff_sequence = [x - mean_f0 for x in f0_no_zeroes]
@@ -101,7 +99,7 @@ def analyze_speech_pitch(worker_id, ass_id, save_location, env, response, wav_fi
         text_response += add_pitch_prosody_tags(start_index, split_response, 
                                           syllable_counts_response, 
                                           f0_percent_change_sequence, 
-                                          datapoints_per_syllable_response, i)
+                                          datapoints_per_syllable_response, i, entrain)
         start_index += int(syllable_counts_response[i] * datapoints_per_syllable_response)
 
     text_response += '</speak>'
@@ -118,52 +116,14 @@ def analyze_speech_pitch(worker_id, ass_id, save_location, env, response, wav_fi
         write_correlation_data([bot_adjacent_ipu], [human_adjacent_ipu], save_location, env, worker_id, ass_id)
 
 def add_pitch_prosody_tags(start_index, split_response, syllable_counts_response, 
-                     f0_percent_change_sequence, datapoints_per_syllable_response, i):
+                     f0_percent_change_sequence, datapoints_per_syllable_response, i, entrain):
     end_index = start_index + int(syllable_counts_response[i] * datapoints_per_syllable_response)
     avg_percent_diff = np.average([datapoint for datapoint in f0_percent_change_sequence[start_index:end_index]])
+    avg_percent_diff = avg_percent_diff if entrain else -avg_percent_diff
     pitch_tag = round(avg_percent_diff, 0)
     pitch_tag = '+' + str(pitch_tag) if pitch_tag > 0 else str(pitch_tag)
     return '<prosody pitch="' + pitch_tag + '%">' + split_response[i] + '</prosody>'
 
-def analyze_speech_amplitude(worker_id, ass_id, save_location, env, response, wav_filename, entrain=True):
-    amplitude, sample_rate = librosa.load(wav_filename)
-    amplitude_no_zeroes = [datapoint for datapoint in amplitude if datapoint != 0]
-    length = len(amplitude_no_zeroes)
-    average_first_half = np.mean(np.abs(amplitude_no_zeroes[:length//2]))
-    average_second_half = np.mean(np.abs(amplitude_no_zeroes[length//2:]))
-    difference = average_second_half - average_first_half
-
-    split_response = response.split(' ')
-    stripped_split_response = [re.sub(r'\W+', '', word) for word in split_response if word]
-    syllable_counts_response = [get_syllable_count(w) if get_syllable_count(w) is not None 
-                                else get_syllable_count(stripped_split_response[i]) 
-                                for i, w in enumerate(stripped_split_response)]
-    total_syllables_response = sum(syllable_counts_response)
-
-    gradient = np.linspace(average_second_half - difference, average_second_half, total_syllables_response)
-    prev_mean_amplitude = 0
-
-    text_response = '<speak>'
-    for word, syllables in zip(split_response, syllable_counts_response):
-        text_response += add_amplitude_prosody_tags(syllables, word, gradient, prev_mean_amplitude)
-        gradient = gradient[syllables:]
-        prev_mean_amplitude = np.mean(gradient[:syllables])
-    text_response += '</speak>'
-    print(text_response)
-
-    audio_stream = synthesize_speech(text_response, save_location, env, worker_id, ass_id)
-
-    if audio_stream is not None:
-        save_speech_file(audio_stream, save_location, env, worker_id, ass_id, text_response)
-        print('Loop complete. Check /comparison directory.')
-
-def add_amplitude_prosody_tags(syllables, word, gradient, prev_mean_amplitude):
-    word_amplitudes = gradient[:syllables]
-    mean_amplitude = np.mean(word_amplitudes)
-    amplitude_change = mean_amplitude - prev_mean_amplitude
-    volume_level = round(amplitude_change, 6)
-    volume_level = "+" + str(volume_level) if volume_level >= 0 else str(volume_level)
-    return '<prosody volume="' + volume_level + 'dB">' + word + '</prosody>'
 
 def synthesize_speech(text_response, save_location, env, worker_id, ass_id):
     polly_object = PollyWrapper(boto3.client('polly', region_name='us-east-1'), boto3.resource('s3', region_name='us-east-1'))
@@ -215,7 +175,8 @@ def list_words_by_pitch(response, wav_filename, frame_period, entrain=True):
     # Perform pitch analysis
     x_var, fs_var = sf.read(wav_filename)
     if not entrain:
-        x_var = x_var[::-1]
+        mean_x = np.mean(x_var)
+        x_var = 2*mean_x - x_var
     x_var_contiguous = np.ascontiguousarray(x_var)
     f0_var = pw.harvest(x_var_contiguous, fs_var, f0_floor=80.0, f0_ceil=270, frame_period=frame_period)[0]
 
@@ -250,8 +211,6 @@ def list_words_by_pitch(response, wav_filename, frame_period, entrain=True):
 def list_words_by_amplitude(response, wav_filename, entrain=True):
     # Perform amplitude analysis
     amplitude, sample_rate = librosa.load(wav_filename)
-    if not entrain:
-        amplitude = amplitude[::-1]
     amplitude_no_zeroes = [datapoint for datapoint in amplitude if datapoint != 0]
     length = len(amplitude_no_zeroes)
     average_first_half = np.mean(np.abs(amplitude_no_zeroes[:length // 2]))
@@ -280,6 +239,46 @@ def list_words_by_amplitude(response, wav_filename, entrain=True):
         prev_mean_amplitude = mean_amplitude
 
     return amplitude_changes
+
+def analyze_speech_amplitude(worker_id, ass_id, save_location, env, response, wav_filename, entrain=True):
+    amplitude, sample_rate = librosa.load(wav_filename)
+    amplitude_no_zeroes = [datapoint for datapoint in amplitude if datapoint != 0]
+    length = len(amplitude_no_zeroes)
+    average_first_half = np.mean(np.abs(amplitude_no_zeroes[:length//2]))
+    average_second_half = np.mean(np.abs(amplitude_no_zeroes[length//2:]))
+    difference = average_second_half - average_first_half
+
+    split_response = response.split(' ')
+    stripped_split_response = [re.sub(r'\W+', '', word) for word in split_response if word]
+    syllable_counts_response = [get_syllable_count(w) if get_syllable_count(w) is not None 
+                                else get_syllable_count(stripped_split_response[i]) 
+                                for i, w in enumerate(stripped_split_response)]
+    total_syllables_response = sum(syllable_counts_response)
+
+    gradient = np.linspace(average_second_half - difference, average_second_half, total_syllables_response)
+    prev_mean_amplitude = 0
+
+    text_response = '<speak>'
+    for word, syllables in zip(split_response, syllable_counts_response):
+        text_response += add_amplitude_prosody_tags(syllables, word, gradient, prev_mean_amplitude)
+        gradient = gradient[syllables:]
+        prev_mean_amplitude = np.mean(gradient[:syllables])
+    text_response += '</speak>'
+    print(text_response)
+
+    audio_stream = synthesize_speech(text_response, save_location, env, worker_id, ass_id)
+
+    if audio_stream is not None:
+        save_speech_file(audio_stream, save_location, env, worker_id, ass_id, text_response)
+        print('Loop complete. Check /comparison directory.')
+
+def add_amplitude_prosody_tags(syllables, word, gradient, prev_mean_amplitude):
+    word_amplitudes = gradient[:syllables]
+    mean_amplitude = np.mean(word_amplitudes)
+    amplitude_change = mean_amplitude - prev_mean_amplitude
+    volume_level = round(amplitude_change, 6)
+    volume_level = "+" + str(volume_level) if volume_level >= 0 else str(volume_level)
+    return '<prosody volume="' + volume_level + 'dB">' + word + '</prosody>'
 
 def synthesize_combined_features(worker_id, ass_id, save_location, env, response, wav_filename, features, frame_period=5):
 
@@ -347,10 +346,10 @@ def main(save_location, env, worker_id, ass_id, entrainment_features):
 
 #main('./', 'sandbox', '1', '1', ['entrain-pitch', 'entrain-volume'])
 #main('./', 'sandbox', '2', '2', ['entrain-pitch', 'disentrain-volume'])
-#main('./', 'sandbox', '3', '3', ['entrain-pitch'])
+#main('./', 'sandbox', '6', '6', ['entrain-pitch'])
 #main('./', 'sandbox', '4', '4', ['disentrain-pitch', 'entrain-volume'])
 #main('./', 'sandbox', '5', '5', ['disentrain-pitch', 'disentrain-volume'])
 #main('./', 'sandbox', '6', '6', ['disentrain-pitch'])
-#main('./', 'sandbox', '7', '7', ['entrain-volume'])
+main('./', 'sandbox', '6', '6', ['entrain-volume'])
 #main('./', 'sandbox', '8', '8', ['disentrain-volume'])
 #main('./', 'sandbox', '9', '9', [])
