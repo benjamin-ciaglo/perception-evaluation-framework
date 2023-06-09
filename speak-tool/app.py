@@ -162,19 +162,20 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 	is_preview = (ass_id is None)
 	
 	if (not is_preview) and (ass_id + "_" + test_idx + "_starttime" in session):
-			return render_template(record_template,
-				error=multiple_attempts_true,
-				proctor=proctor_name,
-				battery=battery_name,
-				test=test_idx,
-				question=question_idx,
-				questionIdx1Based=str(int(question_idx)+1),
-				numQuestions=n,
-				assignmentId=ass_id,
-				hitId=hit_id,
-				turkSubmitTo=submit_path,
-				workerId=worker_id,
-			is_not_preview=is_not_preview)
+		is_not_preview = not is_preview
+		return render_template(record_template,
+			error=multiple_attempts_true,
+			proctor=proctor_name,
+			battery=battery_name,
+			test=test_idx,
+			question=question_idx,
+			questionIdx1Based=str(int(question_idx)+1),
+			numQuestions=n,
+			assignmentId=ass_id,
+			hitId=hit_id,
+			turkSubmitTo=submit_path,
+			workerId=worker_id,
+		is_not_preview=is_not_preview)
 	else:
 		print(session)
 		print(ass_id)
