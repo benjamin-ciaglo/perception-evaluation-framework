@@ -171,6 +171,11 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 	scripts.print_row('question:', question_idx)
 
 	is_preview = (ass_id is None)
+	if not is_preview and not (ass_id + "_" + test_idx + "_starttime" in session):
+		session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+		with open(session_file, 'r') as rf:
+			session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
+			session[ass_id + "_" + test_idx + "_starttime"] = float(rf.readlines()[0].strip('\n'))
 	
 	if (not is_preview) and (ass_id + "_" + test_idx + "_starttime" in session):
 		is_not_preview = not is_preview
