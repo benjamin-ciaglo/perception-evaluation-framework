@@ -130,9 +130,6 @@ def consent(proctor_name, battery_name, test_idx):
 		return render_template(recruitment_and_consent_template,
 				nextPage=nextPage
 			)
-	else:
-		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
-		return redirect(nextPage)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 1: record user input
