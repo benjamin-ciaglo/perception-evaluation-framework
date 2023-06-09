@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
 import pyworld as pw
-from polly_wrapper import PollyWrapper
+from world.polly_wrapper import PollyWrapper
 import boto3
 from pysyllables import get_syllable_count
 
@@ -177,8 +177,7 @@ def list_words_by_pitch(response, wav_filename, frame_period, entrain=True):
     if not entrain:
         mean_x = np.mean(x_var)
         x_var = 2*mean_x - x_var
-    x_var_contiguous = np.ascontiguousarray(x_var)
-    f0_var = pw.harvest(x_var_contiguous, fs_var, f0_floor=80.0, f0_ceil=270, frame_period=frame_period)[0]
+    f0_var = pw.harvest(x_var, fs_var, f0_floor=80.0, f0_ceil=270, frame_period=frame_period)[0]
 
     f0_no_zeroes = [datapoint for datapoint in f0_var if datapoint > 0]
     mean_f0 = np.mean(f0_no_zeroes)
@@ -207,11 +206,20 @@ def list_words_by_pitch(response, wav_filename, frame_period, entrain=True):
 
     return pitch_changes
 
+def amplitude_to_custom_db(amplitude, prev_amplitude):
+    if prev_amplitude == 0:
+        prev_amplitude = amplitude
+    result = round(20 * np.log10(abs(amplitude / prev_amplitude) + 1e-9), 6)
+    if result == 0:
+        return 0.000001
+    else:
+        return result
 
 def list_words_by_amplitude(response, wav_filename, entrain=True):
-    # Perform amplitude analysis
     amplitude, sample_rate = librosa.load(wav_filename)
-    amplitude_no_zeroes = [datapoint for datapoint in amplitude if datapoint != 0]
+    amplitude_db = librosa.amplitude_to_db(amplitude)
+    amplitude_normalized = normalize_db_values(amplitude_db, 25, 100)
+    amplitude_no_zeroes = amplitude_normalized
     length = len(amplitude_no_zeroes)
     average_first_half = np.mean(np.abs(amplitude_no_zeroes[:length // 2]))
     average_second_half = np.mean(np.abs(amplitude_no_zeroes[length // 2:]))
@@ -227,22 +235,33 @@ def list_words_by_amplitude(response, wav_filename, entrain=True):
     total_syllables_response = sum(syllable_counts_response)
 
     amplitude_changes = []
-    gradient = np.linspace(average_second_half - difference, average_second_half, total_syllables_response)
+    if entrain:
+        gradient = np.linspace(average_second_half - difference, average_second_half, total_syllables_response)
+    else:
+        gradient = np.linspace(average_first_half, average_first_half - difference, total_syllables_response)
     prev_mean_amplitude = 0
     for i in range(len(stripped_split_response)):
         syllables = syllable_counts_response[i]
         word_amplitudes = gradient[:syllables]
         mean_amplitude = np.mean(word_amplitudes)
-        amplitude_change = mean_amplitude - prev_mean_amplitude
-        amplitude_changes.append(round(amplitude_change, 6))
+        amplitude_change = amplitude_to_custom_db(mean_amplitude, prev_mean_amplitude)
+        amplitude_changes.append(amplitude_change)
         gradient = gradient[syllables:]
         prev_mean_amplitude = mean_amplitude
-
     return amplitude_changes
+
+def normalize_db_values(db_values, target_min_db, target_max_db):
+    db_min = np.min(db_values)
+    db_max = np.max(db_values)
+    normalized_db_values = (db_values - db_min) / (db_max - db_min)
+    normalized_db_values = (normalized_db_values * (target_max_db - target_min_db)) + target_min_db
+    return normalized_db_values
 
 def analyze_speech_amplitude(worker_id, ass_id, save_location, env, response, wav_filename, entrain=True):
     amplitude, sample_rate = librosa.load(wav_filename)
-    amplitude_no_zeroes = [datapoint for datapoint in amplitude if datapoint != 0]
+    amplitude_db = librosa.amplitude_to_db(amplitude)
+    amplitude_normalized = normalize_db_values(amplitude_db, 55, 65)
+    amplitude_no_zeroes = amplitude_normalized
     length = len(amplitude_no_zeroes)
     average_first_half = np.mean(np.abs(amplitude_no_zeroes[:length//2]))
     average_second_half = np.mean(np.abs(amplitude_no_zeroes[length//2:]))
@@ -255,7 +274,10 @@ def analyze_speech_amplitude(worker_id, ass_id, save_location, env, response, wa
                                 for i, w in enumerate(stripped_split_response)]
     total_syllables_response = sum(syllable_counts_response)
 
-    gradient = np.linspace(average_second_half - difference, average_second_half, total_syllables_response)
+    if entrain:
+        gradient = np.linspace(average_second_half - difference, average_second_half, total_syllables_response)
+    else:
+        gradient = np.linspace(average_first_half, average_first_half - difference, total_syllables_response)
     prev_mean_amplitude = 0
 
     text_response = '<speak>'
@@ -264,7 +286,6 @@ def analyze_speech_amplitude(worker_id, ass_id, save_location, env, response, wa
         gradient = gradient[syllables:]
         prev_mean_amplitude = np.mean(gradient[:syllables])
     text_response += '</speak>'
-    print(text_response)
 
     audio_stream = synthesize_speech(text_response, save_location, env, worker_id, ass_id)
 
@@ -275,13 +296,12 @@ def analyze_speech_amplitude(worker_id, ass_id, save_location, env, response, wa
 def add_amplitude_prosody_tags(syllables, word, gradient, prev_mean_amplitude):
     word_amplitudes = gradient[:syllables]
     mean_amplitude = np.mean(word_amplitudes)
-    amplitude_change = mean_amplitude - prev_mean_amplitude
-    volume_level = round(amplitude_change, 6)
-    volume_level = "+" + str(volume_level) if volume_level >= 0 else str(volume_level)
+    amplitude_change = amplitude_to_custom_db(mean_amplitude, prev_mean_amplitude)
+    volume_level = amplitude_change
+    volume_level = "+" + "{:.6f}".format(volume_level) if volume_level >= 0 else "{:.6f}".format(volume_level)
     return '<prosody volume="' + volume_level + 'dB">' + word + '</prosody>'
 
 def synthesize_combined_features(worker_id, ass_id, save_location, env, response, wav_filename, features, frame_period=5):
-
     if 'entrain-pitch' in features:
         entrain_pitch = True
     else:
@@ -305,10 +325,8 @@ def synthesize_combined_features(worker_id, ass_id, save_location, env, response
         if pitch_change > 0:
             pitch_change = '+' + str(pitch_change)
         
-        if volume_change >= 0:
-            text_response += f'<prosody pitch="{pitch_change}%" volume="+{volume_change}dB">{word}</prosody>'
-        else:
-            text_response += f'<prosody pitch="{pitch_change}%" volume="{volume_change}dB">{word}</prosody>'
+        volume_change = "+" + "{:.6f}".format(volume_change) if volume_change >= 0 else "{:.6f}".format(volume_change)
+        text_response += f'<prosody pitch="{pitch_change}%" volume="{volume_change}dB">{word}</prosody>'
 
     text_response += '</speak>'
     synthesize_speech(text_response, save_location, env, worker_id, ass_id)
@@ -344,12 +362,12 @@ def main(save_location, env, worker_id, ass_id, entrainment_features):
     wav_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
     perform_analysis(worker_id, ass_id, save_location, env, response, wav_filename, entrainment_features)
 
-#main('./', 'sandbox', '1', '1', ['entrain-pitch', 'entrain-volume'])
-#main('./', 'sandbox', '2', '2', ['entrain-pitch', 'disentrain-volume'])
-#main('./', 'sandbox', '6', '6', ['entrain-pitch'])
-#main('./', 'sandbox', '4', '4', ['disentrain-pitch', 'entrain-volume'])
-#main('./', 'sandbox', '5', '5', ['disentrain-pitch', 'disentrain-volume'])
-#main('./', 'sandbox', '6', '6', ['disentrain-pitch'])
-main('./', 'sandbox', '6', '6', ['entrain-volume'])
-#main('./', 'sandbox', '8', '8', ['disentrain-volume'])
-#main('./', 'sandbox', '9', '9', [])
+"""main('./', 'sandbox', '1', '1', ['entrain-pitch', 'entrain-volume'])
+main('./', 'sandbox', '2', '2', ['entrain-pitch', 'disentrain-volume'])
+main('./', 'sandbox', '3', '3', ['entrain-pitch'])
+main('./', 'sandbox', '4', '4', ['disentrain-pitch', 'entrain-volume'])
+main('./', 'sandbox', '5', '5', ['disentrain-pitch', 'disentrain-volume'])
+main('./', 'sandbox', '6', '6', ['disentrain-pitch'])
+main('./', 'sandbox', '7', '7', ['entrain-volume'])
+main('./', 'sandbox', '8', '8', ['disentrain-volume'])
+main('./', 'sandbox', '9', '9', [])"""
