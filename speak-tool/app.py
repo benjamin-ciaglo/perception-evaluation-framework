@@ -298,7 +298,7 @@ def evaluate(proctor_name, battery_name, test_idx, question_idx):
 	)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# STEP 5: data collection complete (if applicable, tell mturk that worker is done)
+# STEP 5: data collection complete (if applicable, tell mturk that worker is done), submit to mTurk
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/<proctor_name>/<battery_name>/thanks/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def complete(proctor_name, battery_name, test_idx, question_idx):
@@ -367,73 +367,18 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 				'worker_ip':worker_ip, 'worker_country':worker_country, 'worker_region':worker_region, 'worker_city':worker_city,
 				'test_idx':test_idx, 'test_passed':session[ass_id + "_" + test_idx + "_" + 'overall'], 'questions_passed':''	}
 
-		for i in range(0, n):
-			filename = os.path.join(save_location, env, worker_id + "_" + ass_id + "_worker_recording_transcript.txt")
-			payload['question_'+str(i)+'_rec'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+".wav")
-			payload['question_'+str(i)+'_worker_recording_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+"_worker_recording_transcript.txt")
-			with open(filename,'r') as f:
-				payload['question_'+str(i)+'_worker_recording_transcript'] = f.read()
-			payload['questions_passed'] = payload['questions_passed'] + " " + str(session[ass_id + "_" + test_idx + "_" + str(i)])
 		print('final payload:',payload)
+		submit_link = 'https://www.mturk.com/mturk/externalSubmit' if (env == 'production') else 'https://workersandbox.mturk.com/mturk/externalSubmit'
+
+		session.clear()
+		print('session cleared. ready to submit.')
+		print('  ---- task complete -------------')
+
+		turk_submit_final = submit_link + '?' + urllib.parse.urlencode(payload)
 		###
-		return submit(proctor_name, battery_name, test_idx)
+		return redirect(turk_submit_final)
 	else:
 		return render_template('base/thanks_no-turk.html', nextTask='/'+proctor_name)
-
-# --------------------------------------------------------------------------------------
-# STEP 6: submit to mturk
-# --------------------------------------------------------------------------------------
-def submit(proctor_name, battery_name, test_idx):
-	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
-	print('submit: ')
-	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
-
-	print("\nass_id:",ass_id)
-	print("hit_id:",hit_id)
-	print("submit_path:",submit_path)
-	print("worker_id:",worker_id)
-
-	# production vs sandbox environment
-	submit_link = 'https://www.mturk.com/mturk/externalSubmit' if (env == 'production') else 'https://workersandbox.mturk.com/mturk/externalSubmit'
-
-	localtime = time.asctime(time.localtime(time.time()))
-	worker_ip = request.environ['REMOTE_ADDR']
-	try:
-		ip_loc = iplocator.city(worker_ip)
-		worker_country = "%s (%s)" % (ip_loc.country.name, ip_loc.country.iso_code)
-		worker_region = "%s (%s)" % (ip_loc.subdivisions.most_specific.name, ip_loc.subdivisions.most_specific.iso_code)
-		worker_city = ip_loc.city.name
-	except Exception:
-		worker_country = "N/A"
-		worker_region = "N/A"
-		worker_city = "N/A"
-
-	elapsed_time = time.time() - session.get(ass_id + "_" + test_idx + "_starttime", 0)
-	probably_not_fraud = True if (elapsed_time > 15) else False
-
-	payload = {	'hit_id':hit_id, 'assignmentId':ass_id, 'worker_id':worker_id, 'environment':env,
-			'datetime_completed':localtime, 'elapsed_time':elapsed_time, 'probably_not_fraud':str(probably_not_fraud),
-			'worker_ip':worker_ip, 'worker_country':worker_country, 'worker_region':worker_region, 'worker_city':worker_city,
-			'test_idx':test_idx, 'test_passed':session[ass_id + "_" + test_idx + "_" + 'overall'], 'questions_passed':''	}
-
-	for i in range(0, n):
-		filename = os.path.join(save_location, env,worker_id + "_" + ass_id + "_worker_recording_transcript.txt")
-		payload['question_'+str(i)+'_rec'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+".wav")
-		payload['question_'+str(i)+'_worker_recording_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+"_worker_recording_transcript.txt")
-		with open(filename,'r') as f:
-			payload['question_'+str(i)+'_worker_recording_transcript'] = f.read()
-		payload['questions_passed'] = payload['questions_passed'] + " " + str(session[ass_id + "_" + test_idx + "_" + str(i)])
-	print('final payload:',payload)
-
-	payload = {'assignmentId': ass_id}
-
-	session.clear()
-	print('session cleared. ready to submit.')
-	print('  ---- task complete -------------')
-
-	turk_submit_final = submit_link + '?' + urllib.parse.urlencode(payload)
-	print(turk_submit_final)
-	return redirect(turk_submit_final)
 
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
