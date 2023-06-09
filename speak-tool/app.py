@@ -114,7 +114,10 @@ def init_test(proctor_name, battery_name, test_idx):
 		session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
 		session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
 		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
-	return redirect(nextPage)
+		return redirect(nextPage)
+	else:
+		nextPage = '/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
+		return redirect(nextPage)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 0b: show recruitment/consent info, give test
@@ -306,40 +309,43 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 	# final thanks + instructions for worker
 	print('    workerId:', worker_id, 'done with all questions for test', test_idx,'of',battery_name + '.')	
 
-	print('  ---- task complete -------------')
-	###
-	submit_link = 'https://www.mturk.com/mturk/externalSubmit' if (env == 'production') else 'https://workersandbox.mturk.com/mturk/externalSubmit'
+	if (proctor_name == 'turk'):
+		print('  ---- task complete -------------')
+		###
+		submit_link = 'https://www.mturk.com/mturk/externalSubmit' if (env == 'production') else 'https://workersandbox.mturk.com/mturk/externalSubmit'
 
-	localtime = time.asctime(time.localtime(time.time()))
-	worker_ip = request.environ['REMOTE_ADDR']
-	try:
-		ip_loc = iplocator.city(worker_ip)
-		worker_country = "%s (%s)" % (ip_loc.country.name, ip_loc.country.iso_code)
-		worker_region = "%s (%s)" % (ip_loc.subdivisions.most_specific.name, ip_loc.subdivisions.most_specific.iso_code)
-		worker_city = ip_loc.city.name
-	except Exception:
-		worker_country = "N/A"
-		worker_region = "N/A"
-		worker_city = "N/A"
+		localtime = time.asctime(time.localtime(time.time()))
+		worker_ip = request.environ['REMOTE_ADDR']
+		try:
+			ip_loc = iplocator.city(worker_ip)
+			worker_country = "%s (%s)" % (ip_loc.country.name, ip_loc.country.iso_code)
+			worker_region = "%s (%s)" % (ip_loc.subdivisions.most_specific.name, ip_loc.subdivisions.most_specific.iso_code)
+			worker_city = ip_loc.city.name
+		except Exception:
+			worker_country = "N/A"
+			worker_region = "N/A"
+			worker_city = "N/A"
 
-	elapsed_time = time.time() - session.get(ass_id + "_" + test_idx + "_starttime", 0)
-	probably_not_fraud = True if (elapsed_time > 15) else False
+		elapsed_time = time.time() - session.get(ass_id + "_" + test_idx + "_starttime", 0)
+		probably_not_fraud = True if (elapsed_time > 15) else False
 
-	payload = {	'hitId':hit_id, 'assignmentId':ass_id, 'workerId':worker_id, 'turkSubmitTo':submit_link, 'environment':env,
-			'datetime_completed':localtime, 'elapsed_time':elapsed_time, 'probably_not_fraud':str(probably_not_fraud),
-			'worker_ip':worker_ip, 'worker_country':worker_country, 'worker_region':worker_region, 'worker_city':worker_city,
-			'test_idx':test_idx, 'test_passed':session[ass_id + "_" + test_idx + "_" + 'overall'], 'questions_passed':''	}
+		payload = {	'hitId':hit_id, 'assignmentId':ass_id, 'workerId':worker_id, 'turkSubmitTo':submit_link, 'environment':env,
+				'datetime_completed':localtime, 'elapsed_time':elapsed_time, 'probably_not_fraud':str(probably_not_fraud),
+				'worker_ip':worker_ip, 'worker_country':worker_country, 'worker_region':worker_region, 'worker_city':worker_city,
+				'test_idx':test_idx, 'test_passed':session[ass_id + "_" + test_idx + "_" + 'overall'], 'questions_passed':''	}
 
-	for i in range(0, n):
-		filename = os.path.join(save_location, env, worker_id + "_" + ass_id + "_worker_recording_transcript.txt")
-		payload['question_'+str(i)+'_rec'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+".wav")
-		payload['question_'+str(i)+'_worker_recording_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+"_worker_recording_transcript.txt")
-		with open(filename,'r') as f:
-			payload['question_'+str(i)+'_worker_recording_transcript'] = f.read()
-		payload['questions_passed'] = payload['questions_passed'] + " " + str(session[ass_id + "_" + test_idx + "_" + str(i)])
-	print('final payload:',payload)
-	###
-	return submit(proctor_name, battery_name, test_idx)
+		for i in range(0, n):
+			filename = os.path.join(save_location, env, worker_id + "_" + ass_id + "_worker_recording_transcript.txt")
+			payload['question_'+str(i)+'_rec'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+".wav")
+			payload['question_'+str(i)+'_worker_recording_transcript_loc'] = os.path.join(app_dir,'user-content',proctor_name,worker_id+"_"+ass_id+"_worker_recording_transcript.txt")
+			with open(filename,'r') as f:
+				payload['question_'+str(i)+'_worker_recording_transcript'] = f.read()
+			payload['questions_passed'] = payload['questions_passed'] + " " + str(session[ass_id + "_" + test_idx + "_" + str(i)])
+		print('final payload:',payload)
+		###
+		return submit(proctor_name, battery_name, test_idx)
+	else:
+		return render_template('base/thanks_no-turk.html', nextTask='/'+proctor_name)
 
 # --------------------------------------------------------------------------------------
 # STEP 6: submit to mturk
