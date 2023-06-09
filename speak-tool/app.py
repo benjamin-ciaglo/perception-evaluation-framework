@@ -131,7 +131,7 @@ def consent(proctor_name, battery_name, test_idx):
 				nextPage=nextPage
 			)
 	else:
-		nextPage = '/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
+		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
 		return redirect(nextPage)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
