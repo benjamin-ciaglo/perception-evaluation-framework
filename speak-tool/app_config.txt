@@ -3,8 +3,7 @@
 # path to templates (within '/templates' subdirectory of this repo)
 record_template = 'prosody_task/recording_prompt.html'
 thanks_template = 'prosody_task/thanks_turk.html'
-recruitment_template = 'prosody_task/recruitment.html'
-consent_template = 'prosody_task/consent.html'
+recruitment_and_consent_template = 'prosody_task/recruitment-consent.html'
 evaluation_template = 'prosody_task/evaluate.html'
 
 # where to save all turk worker data
