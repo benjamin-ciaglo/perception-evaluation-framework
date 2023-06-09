@@ -93,7 +93,7 @@ def init_test(proctor_name, battery_name, test_idx):
 
 	if (worker_id is not None):
 		worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
-		worker_already_completed_this_task = os.path.exists(os.path.join(save_location, env, worker_id + "_" + ass_id + "_" + "score" ".txt"))
+		worker_already_completed_this_task = os.path.exists(os.path.join(save_location, env, worker_id + "_" + "score" ".txt"))
 		if worker_already_completed_this_task:
 			return abort(401)
 		elif worker_already_started_this_task:
@@ -288,7 +288,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 
 	filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
 
-	score_file = os.path.join(save_location, env, worker_id + "_" + ass_id + "_score.txt")
+	score_file = os.path.join(save_location, env, worker_id + "_" + "score.txt")
 	with open(score_file, 'w') as score_handle:
 		score_handle.write(selected_option + '\n')
 	# check if user is at last question
