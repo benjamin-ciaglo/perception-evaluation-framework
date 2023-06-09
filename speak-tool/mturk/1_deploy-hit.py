@@ -41,14 +41,12 @@ def deployHITs(client, preview_url, start_index, end_index, logdir):
                 'QualificationTypeId': '00000000000000000071',
                 'Comparator': 'EqualTo',
                 'LocaleValues': [{'Country': 'US'}],
-                'RequiredToPreview': True,
                 'ActionsGuarded':"DiscoverPreviewAndAccept"
             },
             {
                 'QualificationTypeId': '000000000000000000L0',
                 'Comparator': 'GreaterThan',
                 'IntegerValues': [90],
-                'RequiredToPreview': True,
                 'ActionsGuarded':"DiscoverPreviewAndAccept"
             }
         ]
