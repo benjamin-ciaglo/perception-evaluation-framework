@@ -91,6 +91,7 @@ def init_test(proctor_name, battery_name, test_idx):
 	if proctor_name != 'turk':
 		return abort(404)
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	test_idx = '0'
 
 	if (worker_id is not None):
 		worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
@@ -141,6 +142,7 @@ def init_test(proctor_name, battery_name, test_idx):
 @app.route('/consent/<proctor_name>/<battery_name>/<test_idx>')
 def consent(proctor_name, battery_name, test_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	test_idx = '0'
 	print('consent: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	# redirect worker to first question within HIT, multiple_attempts_true = 0 (false)
@@ -161,6 +163,7 @@ def consent(proctor_name, battery_name, test_idx):
 @app.route('/<proctor_name>/<battery_name>/record-voice/<test_idx>/<question_idx>/<multiple_attempts_true>')
 def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts_true):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	test_idx = '0'
 	print('record: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
@@ -221,6 +224,7 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 @app.route('/<proctor_name>/<battery_name>/upload-voice/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def upload(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	test_idx = '0'
 	print('upload: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	filename = os.path.join(save_location, env, worker_id + "_" + ass_id + "_worker_recording.wav")
@@ -245,6 +249,7 @@ def upload(proctor_name, battery_name, test_idx, question_idx):
 @app.route('/<proctor_name>/<battery_name>/validate-voice/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def validate(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	test_idx = '0'
 	print('validate: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	print('\n  workerId:', worker_id, 'validating...')
@@ -286,6 +291,7 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 @app.route('/<proctor_name>/<battery_name>/evaluate/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def evaluate(proctor_name, battery_name, test_idx, question_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	test_idx = '0'
 	print('evaluate: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	audioFile = worker_id + "_" + ass_id + "_synthesized.wav"
@@ -306,6 +312,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 	print('selected_option: ', selected_option)
 
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
+	test_idx = '0'
 
 	score_file = os.path.join(save_location, env, worker_id + "_" + "score.txt")
 	with open(score_file, 'w') as score_handle:
