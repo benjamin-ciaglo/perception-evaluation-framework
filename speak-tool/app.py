@@ -94,8 +94,13 @@ def init_test(proctor_name, battery_name, test_idx):
 
 	if (worker_id is not None):
 		worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
+		if worker_already_started_this_task:
+			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
+				prev_ass_id = rf.readline().strip('\n')
+			worker_already_uploaded_audio_and_got_response = os.path.exists(os.path.join(save_location, env, worker_id + "_" + prev_ass_id + "_" + "synthesized" ".wav"))
+		else:
+			worker_already_uploaded_audio_and_got_response = False
 		worker_already_completed_this_task = os.path.exists(os.path.join(save_location, env, worker_id + "_" + "score" ".txt"))
-		worker_already_uploaded_audio_and_got_response = os.path.exists(os.path.join(save_location, env, worker_id + "_" + ass_id + "_" + "synthesized" ".wav"))
 		if worker_already_completed_this_task:
 			return abort(401)
 		elif worker_already_uploaded_audio_and_got_response:
