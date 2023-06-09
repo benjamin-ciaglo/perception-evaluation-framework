@@ -159,9 +159,9 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 	scripts.print_row('test:', test_idx)
 	scripts.print_row('question:', question_idx)
 
-	is_not_preview = (ass_id is not None)
+	is_preview = (ass_id is None)
 	
-	if (not is_not_preview) or (ass_id + "_" + test_idx + "_starttime" in session):
+	if (not is_preview) and (ass_id + "_" + test_idx + "_starttime" in session):
 			return render_template(record_template,
 				error=multiple_attempts_true,
 				proctor=proctor_name,
