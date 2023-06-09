@@ -12,7 +12,7 @@ import geoip2.database
 import boto3
 # helpers
 import scripts
-
+from ast import literal_eval
 import sys
 
 # Add the 'perception-evaluation-framework' directory to the Python search path
@@ -92,18 +92,22 @@ def init_test(proctor_name, battery_name, test_idx):
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 
 	if (worker_id is not None):
-		message = pop_sqs_item()
-		entrainment_features = message['Body']
-		entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
-		with open(entrainment_config_filename, 'w') as entrainment_handle:
-			entrainment_handle.write(entrainment_features)
-
 		worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
-		if worker_already_started_this_task:
+		with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
+			prev_ass_id = rf.readline().strip('\n')
+		worker_already_completed_this_task = os.path.exists(os.path.join(save_location, env, worker_id + "_" + ass_id + "_" + "score" ".txt"))
+		if worker_already_completed_this_task:
 			return abort(401)
+		elif worker_already_started_this_task:
+			ass_id = prev_ass_id
 		else:
-			with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
-				wf.write('Worker started task.')
+			with open(os.path.join(save_location, env, worker_id + "_" + ass_id + ".txt"), 'w') as wf:
+				wf.write(ass_id)
+			message = pop_sqs_item()
+			entrainment_features = message['Body']
+			entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
+			with open(entrainment_config_filename, 'w') as entrainment_handle:
+				entrainment_handle.write(entrainment_features)
 		print('init: ')
 		print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 		print('submit_path: ', submit_path, ' arg_string: ', arg_string)
@@ -246,6 +250,7 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 		entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
 		with open(entrainment_config_filename, 'r') as entrainment_handle:
 			entrainment_config = entrainment_handle.readlines()[0]
+		entrainment_config = literal_eval(entrainment_config)
 		experiment.main(save_location, env, worker_id, ass_id, entrainment_config)
 		print('  workerId:', worker_id, 'redirecting...')
 		return redirect('/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/' + question_idx + arg_string)
