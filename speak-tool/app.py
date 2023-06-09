@@ -103,7 +103,7 @@ def init_test(proctor_name, battery_name, test_idx):
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
 				prev_ass_id = rf.readline().strip('\n')
 			ass_id = prev_ass_id
-			nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/0' + arg_string
+			nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
 		else:
 			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
 		print('init: ')
