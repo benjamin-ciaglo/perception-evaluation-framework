@@ -111,6 +111,8 @@ def init_test(proctor_name, battery_name, test_idx):
 		print('submit_path: ', submit_path, ' arg_string: ', arg_string)
 		session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
 		session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
+	else:
+		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + arg_string
 	return redirect(nextPage)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
