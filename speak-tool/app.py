@@ -107,7 +107,7 @@ def init_test(proctor_name, battery_name, test_idx):
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
 				prev_ass_id = rf.readline().strip('\n')
 			arg_string = re.sub(r'assignmentId=.*?&', 'assignmentId=' + prev_ass_id + '&', arg_string)
-			nextPage = '/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/0/0' + arg_string
+			nextPage = '/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/0' + arg_string
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'r') as rf:
 				session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
