@@ -154,13 +154,15 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 	print('record: ')
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
-	with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
-		wf.write(ass_id)
-	message = pop_sqs_item()
-	entrainment_features = message['Body']
-	entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
-	with open(entrainment_config_filename, 'w') as entrainment_handle:
-		entrainment_handle.write(entrainment_features)
+	worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
+	if not worker_already_started_this_task:
+		with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
+			wf.write(ass_id)
+		message = pop_sqs_item()
+		entrainment_features = message['Body']
+		entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
+		with open(entrainment_config_filename, 'w') as entrainment_handle:
+			entrainment_handle.write(entrainment_features)
 	if (multiple_attempts_true == '1'):
 		print('\n  ---- worker recording (failed the first time) -----')
 	else:
