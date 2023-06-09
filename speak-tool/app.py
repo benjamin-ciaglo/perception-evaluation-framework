@@ -99,18 +99,29 @@ def init_test(proctor_name, battery_name, test_idx):
 			return abort(401)
 		elif worker_already_uploaded_audio_and_got_response:
 			nextPage = '/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/0/0' + arg_string
+			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+			with open(session_file, 'r') as rf:
+				session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
+				session[ass_id + "_" + test_idx + "_starttime"] = rf.readlines[0].strip('\n')
 		elif worker_already_started_this_task:
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
 				prev_ass_id = rf.readline().strip('\n')
 			ass_id = prev_ass_id
 			nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/1' + arg_string
+			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+			with open(session_file, 'r') as rf:
+				session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
+				session[ass_id + "_" + test_idx + "_starttime"] = rf.readlines[0].strip('\n')
 		else:
 			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
-		print('init: ')
-		print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
-		print('submit_path: ', submit_path, ' arg_string: ', arg_string)
-		session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
-		session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
+			print('init: ')
+			print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
+			print('submit_path: ', submit_path, ' arg_string: ', arg_string)
+			session.clear()	# clear all cookies from other hits, in case multiple hits accomplished in one sitting
+			session[ass_id + "_" + test_idx + "_starttime"] = time.time() # start task timer
+			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+			with open(session_file, 'w') as wf:
+				wf.write(session[ass_id + "_" + test_idx + "_starttime"])
 	else:
 		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 	return redirect(nextPage)
