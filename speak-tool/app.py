@@ -111,6 +111,7 @@ def init_test(proctor_name, battery_name, test_idx):
 			arg_string = re.sub(r'assignmentId=.*?&', 'assignmentId=' + prev_ass_id + '&', arg_string)
 			nextPage = '/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/0' + arg_string
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
+			session.clear()
 			with open(session_file, 'rb') as file:
 				session_data = pickle.load(file)
 				session.update(session_data)
@@ -119,6 +120,7 @@ def init_test(proctor_name, battery_name, test_idx):
 				prev_ass_id = rf.readline().strip('\n')
 			arg_string = re.sub(r'assignmentId=.*?&', 'assignmentId=' + prev_ass_id + '&', arg_string)
 			nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/1' + arg_string
+			session.clear()
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'rb') as file:
 				session_data = pickle.load(file)
@@ -190,6 +192,7 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 
 	is_preview = (ass_id is None)
 	if not is_preview and not (ass_id + "_starttime" in session):
+		session.clear()
 		session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 		with open(session_file, 'rb') as file:
 			session_data = pickle.load(file)
