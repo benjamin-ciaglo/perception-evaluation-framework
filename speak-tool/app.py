@@ -126,6 +126,7 @@ def init_test(proctor_name, battery_name, test_idx):
 			print('init: ')
 			print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 			print('submit_path: ', submit_path, ' arg_string: ', arg_string)
+			session.clear()
 			session[ass_id + "_starttime"] = time.time() # start task timer
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			with open(session_file, 'wb') as file:
