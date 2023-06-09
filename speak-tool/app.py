@@ -340,7 +340,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 			worker_city = "N/A"
 
 		elapsed_time = time.time() - session.get(ass_id + "_" + test_idx + "_starttime", 0)
-		probably_not_fraud = True if (elapsed_time > 10) else False
+		probably_not_fraud = True
 
 		payload = {	'hitId':hit_id, 'assignmentId':ass_id, 'workerId':worker_id, 'turkSubmitTo':submit_link, 'environment':env,
 				'datetime_completed':localtime, 'elapsed_time':elapsed_time, 'probably_not_fraud':str(probably_not_fraud),
