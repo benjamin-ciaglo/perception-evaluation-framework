@@ -125,7 +125,9 @@ def deploy_sqs_items():
     list7 = ['entrain-volume']
     list8 = ['disentrain-volume']
     list9 = []
-    python_lists = [list9]
+    python_lists = [list1, list2, list3, list4, list5, list6, list7, list8, list9, \
+                    list1, list2, list3, list4, list5, list6, list7, list8, list9, \
+                    list1, list2, list3, list4, list5, list6, list7, list8, list9]
 
     sqs = boto3.client('sqs')
 
