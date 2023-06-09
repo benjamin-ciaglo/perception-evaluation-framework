@@ -307,37 +307,9 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 
 	ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 
-	print('complete: ')
-	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
-	print('\n    workerId:', worker_id, '  successfully redirected. checking if worker completed all questions...')
-
-	filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
-
 	score_file = os.path.join(save_location, env, worker_id + "_" + "score.txt")
 	with open(score_file, 'w') as score_handle:
 		score_handle.write(selected_option + '\n')
-	# check if user is at last question
-	if int(question_idx) != (n-1):
-		print('    workerId:', worker_id, 'not yet done. redirecting to next question...')
-		next_q = str(int(question_idx) + 1)
-		return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + next_q + '/0' + arg_string)
-	print('    workerId:', worker_id, 'done with all tasks for test', test_idx + '.')
-
-	# calculate how many tasks worker passed; record in CSV file whether worker passed grading criteria (i.e. whether to accept/reject HIT)
-	if (proctor_name == 'turk'):
-		num_passes = 0
-		try:
-			for i in range(0,n):
-				print('    test',str(i),'passed:', session[ass_id + "_" + test_idx + "_" + str(i)])
-				if session[ass_id + "_" + test_idx + "_" + str(i)]:
-					num_passes += 1
-		except Exception:
-			num_passes = 0
-		print("    num passes:", num_passes)
-		accept_hit = True if (num_passes / n >= accept_criteria) else False
-		session[ass_id + "_" + test_idx + "_" + 'overall'] = accept_hit
-		print('    workerId:', worker_id + ',', 'assignmentId:', ass_id + ',', '# tests passed:',num_passes,"/", n)
-		print('      accept hit:', str(accept_hit) + ',', 'saved.')
 
 	# final thanks + instructions for worker
 	print('    workerId:', worker_id, 'done with all questions for test', test_idx,'of',battery_name + '.')	
@@ -360,12 +332,11 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 			worker_city = "N/A"
 
 		elapsed_time = time.time() - session.get(ass_id + "_" + test_idx + "_starttime", 0)
-		probably_not_fraud = True if (elapsed_time > 15) else False
+		probably_not_fraud = True if (elapsed_time > 10) else False
 
 		payload = {	'hitId':hit_id, 'assignmentId':ass_id, 'workerId':worker_id, 'turkSubmitTo':submit_link, 'environment':env,
 				'datetime_completed':localtime, 'elapsed_time':elapsed_time, 'probably_not_fraud':str(probably_not_fraud),
-				'worker_ip':worker_ip, 'worker_country':worker_country, 'worker_region':worker_region, 'worker_city':worker_city,
-				'test_idx':test_idx, 'test_passed':session[ass_id + "_" + test_idx + "_" + 'overall'], 'questions_passed':''	}
+				'worker_ip':worker_ip, 'worker_country':worker_country, 'worker_region':worker_region, 'worker_city':worker_city}
 
 		print('final payload:',payload)
 		submit_link = 'https://www.mturk.com/mturk/externalSubmit' if (env == 'production') else 'https://workersandbox.mturk.com/mturk/externalSubmit'
