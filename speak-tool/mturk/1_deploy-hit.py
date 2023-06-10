@@ -29,10 +29,10 @@ def deployHITs(client, preview_url, start_index, end_index, logdir):
     # HIT metadata
     # -------------------------------------------------------------------------------
     TaskAttributes = {
-        'MaxAssignments': 27,
+        'MaxAssignments': 9,
         'LifetimeInSeconds': 30 * 60 * 60 * 24,
         'AssignmentDurationInSeconds': 10 * 60,
-        'Reward': '5.00',
+        'Reward': '3.34',
         'Title': 'Record yourself describing this week\'s weather',
         'Keywords': 'sound, label, read, record, voice',
         'Description': 'Submit an audio recording of yourself describing this week\'s weather.',
@@ -123,9 +123,7 @@ def deploy_sqs_items():
     list7 = ['entrain-volume']
     list8 = ['disentrain-volume']
     list9 = []
-    python_lists = [list1, list2, list3, list4, list5, list6, list7, list8, list9, \
-                    list1, list2, list3, list4, list5, list6, list7, list8, list9, \
-                    list1, list2, list3, list4, list5, list6, list7, list8, list9]
+    python_lists = [list1, list2, list3, list4, list5, list6, list7, list8, list9]
 
     sqs = boto3.client('sqs')
 
@@ -160,4 +158,4 @@ if __name__ == "__main__":
     deploy_sqs_items()
     # -------------------
     # deploy HITs
-    deployHITs(client, preview_url, 0, 27, args.logdir)
+    deployHITs(client, preview_url, 0, 9, args.logdir)
