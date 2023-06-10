@@ -174,25 +174,29 @@ function recSubmit(blob) {
 	// .wav file name (without extension)
 	var filename = new Date().toISOString();
 
-	// create download link
-	/*
-	var link = document.createElement('a');
-	link.href = url;
-	link.download = filename+".wav";
-	link.innerHTML = "Save to disk";
-	*/
-
 	// assemble form data to be submitted to URL upload_link
 	// (upload_link var declared in recorder template)
 	var fd = new FormData();
 	fd.append("audio_data", blob, filename);
 
 	// send POST request to URL upload_link (async), then redirect user to next link
-	postRequestAsync(upload_link, next_link, fd).then(next => redirectUser(next));
+	postRequestAsync(upload_link, next_link, fd)
+		.then(next => redirectUser(next))
+		.catch(err => {
+			console.log('There was an error with the upload:', err);
+			status_msg.innerHTML = 'There was an error with the upload. Please try again.';
+		});
 }
  
 async function postRequestAsync(upload, next, file) {
 	let response = await fetch(upload, {method: "POST", body: file});
+	
+	// Check if the response is OK (status 200-299)
+	if (!response.ok) {
+		// NOT OK? Reject the promise with the status text
+		throw new Error(response.statusText);
+	}
+	
 	console.log("recording submitted.");
 	return next;
 }
