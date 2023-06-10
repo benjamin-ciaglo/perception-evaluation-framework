@@ -240,7 +240,6 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 	#print('    val1a (numwords): ' + str(test_numwords))
 	print('    val1b (soundlength): ' + str(test_soundlength))
 	#session[ass_id + "_" + question_idx] = test_numwords & test_soundlength# & (test_wer < 0.2)
-	session[ass_id + "_" + question_idx] = test_soundlength & test_numwords & test_soundlength
 	print("    worker passes this task:",session[ass_id + "_" + question_idx])
 
 	if not session[ass_id + "_" + question_idx]:
