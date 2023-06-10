@@ -135,10 +135,8 @@ function recStart() {
 	// record button is now a stop button
 	recBtn.className = 'button stopButton';
 	recBtn.innerHTML = 'Stop';
-	status_msg.innerHTML = 'Now recording. Press the "Stop" button below to stop recording. The recording will stop automatically after 45 seconds.';
+	status_msg.innerHTML = 'Now recording. Press the "Stop" button below to stop recording.';
 	document.getElementById("example").className = "hidden";
-
-	timer = setTimeout(recStopSubmit, 45000);
 }
 
 
@@ -168,7 +166,7 @@ function recStopSubmit() {
 // submit recording + redirect user to another website (create download link code included as well)
 function recSubmit(blob) {
 	console.log("submitting recording...");
-	status_msg.innerHTML = 'Now submitting your recording. This could take a moment, please be patient. If it fails, please try again and answer in a shorter amount of time.';
+	status_msg.innerHTML = 'Now submitting your recording.';
 
 	var url = URL.createObjectURL(blob);
 
