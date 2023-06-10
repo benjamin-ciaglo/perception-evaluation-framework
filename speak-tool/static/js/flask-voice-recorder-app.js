@@ -123,56 +123,25 @@ function recStartStop() {
 }
 
 
-// this function will be called every 10 seconds to split the audio into chunks
-function stopAndStartRecording() {
-	if (rec) {
-	  // stop the current recording
-	  rec.stop();
-	  // disable audio meter
-	  meter.shutdown();
-	  // stop the audio stream
-	  gumStream.getAudioTracks()[0].stop();
-  
-	  // export current recorded audio and start a new recording
-	  rec.exportWAV((blob) => {
-		recSubmit(blob);
-		startNewRecording();
-	  });
-	} else {
-	  // if rec object is not created yet, start a new recording
-	  startNewRecording();
-	}
-  }
-  
-  function startNewRecording() {
-	// start new getUserMedia() stream
-	navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-	  .then(function(stream) {
-		// save stream; configure audioContext
-		gumStream = stream;
-		input = audioContext.createMediaStreamSource(stream);
-		// create recorder object; configure to record mono sound (1 channel)
-		rec = new Recorder(input,{numChannels:1});
-		// start the recording process
-		rec.record();
-		// restart the audio meter
-		meter = createAudioMeter(audioContext);
-		input.connect(meter);
-	  });
-  }
-  
-  // modify your recStart function to kick off the interval
-  function recStart() {
+// initialize Recorder.js object + start recording
+function recStart() {
 	console.log("starting recording...");
-	startNewRecording();
-	// start the interval
-	setInterval(stopAndStartRecording, 10000); // 10 seconds
+
+    mediaRecorder = new MediaRecorder(gumStream, {mimeType: 'audio/webm;codecs=opus'});
+    mediaRecorder.start();
+
+    mediaRecorder.ondataavailable = function(e) {
+        chunks.push(e.data);
+    }
+
+	console.log("started recording");
+
 	// record button is now a stop button
 	recBtn.className = 'button stopButton';
 	recBtn.innerHTML = 'Stop';
 	status_msg.innerHTML = 'Now recording. Press the "Stop" button below to stop recording. The recording will stop automatically after 45 seconds.';
 	document.getElementById("example").className = "hidden";
-  }
+}
 
 
 // stop recording
