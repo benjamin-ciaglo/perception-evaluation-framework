@@ -98,7 +98,10 @@ def init_test(proctor_name, battery_name, test_idx):
 		worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
 		if worker_already_started_this_task:
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
-				prev_ass_id = rf.readline().strip('\n')
+				line = rf.readline().strip('\n').split('_')
+				prev_ass_id, prev_hit_id = line[0], line[1]
+				arg_string = re.sub(r'assignmentId=.*?&', 'assignmentId=' + prev_ass_id + '&', arg_string)
+				arg_string = re.sub(r'hitId=.*?&', 'hitId=' + prev_hit_id + '&', arg_string)
 			worker_already_uploaded_audio_and_got_response = os.path.exists(os.path.join(save_location, env, worker_id + "_" + prev_ass_id + "_" + "synthesized" ".wav"))
 		else:
 			worker_already_uploaded_audio_and_got_response = False
@@ -107,8 +110,10 @@ def init_test(proctor_name, battery_name, test_idx):
 			return abort(401)
 		elif worker_already_uploaded_audio_and_got_response:
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
-				prev_ass_id = rf.readline().strip('\n')
+				line = rf.readline().strip('\n').split('_')
+				prev_ass_id, prev_hit_id = line[0], line[1]
 			arg_string = re.sub(r'assignmentId=.*?&', 'assignmentId=' + prev_ass_id + '&', arg_string)
+			arg_string = re.sub(r'hitId=.*?&', 'hitId=' + prev_hit_id + '&', arg_string)
 			nextPage = '/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/0' + arg_string
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
 			session.clear()
@@ -117,8 +122,10 @@ def init_test(proctor_name, battery_name, test_idx):
 				session.update(session_data)
 		elif worker_already_started_this_task:
 			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
-				prev_ass_id = rf.readline().strip('\n')
+				line = rf.readline().strip('\n').split('_')
+				prev_ass_id, prev_hit_id = line[0], line[1]
 			arg_string = re.sub(r'assignmentId=.*?&', 'assignmentId=' + prev_ass_id + '&', arg_string)
+			arg_string = re.sub(r'hitId=.*?&', 'hitId=' + prev_hit_id + '&', arg_string)
 			nextPage = '/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/0/1' + arg_string
 			session.clear()
 			session_file = os.path.join(save_location, env, worker_id + "_" + "session" ".txt")
@@ -175,7 +182,7 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 	worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
 	if not worker_already_started_this_task:
 		with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
-			wf.write(ass_id)
+			wf.write(ass_id + '_' + hit_id)
 		message = pop_sqs_item()
 		entrainment_features = message['Body']
 		entrainment_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_entrainment_config.txt")
