@@ -60,7 +60,7 @@ def returnAudioFile(audio_file_name):
 
 @app.errorhandler(401)
 def custom_401(error):
-    return Response('You have already attempted this task, or are trying to access an unauthorized resource. Please contact an administrator if you believe you should not be receiving this message.', 401, {})
+    return Response('You have already started to attempt this task, and it can only be assigned once per worker. Please resume the assignment you started from "Your HITs Queue". Please contact an administrator if you believe you should not be receiving this message.', 401, {})
 
 def pop_sqs_item():
     sqs = boto3.client('sqs', region_name='us-east-1')
@@ -95,8 +95,8 @@ def init_test(proctor_name, battery_name, test_idx):
 
 
 	if (worker_id is not None):
-		worker_already_completed_this_task = os.path.exists(os.path.join(save_location, env, worker_id + "_" + "score" ".txt"))
-		if worker_already_completed_this_task:
+		worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
+		if worker_already_started_this_task:
 			return abort(401)
 		else:
 			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
