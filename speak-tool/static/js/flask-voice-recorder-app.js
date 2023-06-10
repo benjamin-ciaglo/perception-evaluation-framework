@@ -19,6 +19,8 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
 var audioContext;	// audioContext object
 var gumStream;		// getUserMedia() stream
 var rec;		// Recorder.js object
+var mediaRecorder;	// MediaRecorder object
+var chunks = []; // Array to store audio chunks
 var input;		// MediaStreamAudioSourceNode
 
 // volume meter vars
@@ -125,11 +127,13 @@ function recStartStop() {
 function recStart() {
 	console.log("starting recording...");
 
-	// create recorder object; configure to record mono sound (1 channel)
-	rec = new Recorder(input,{numChannels:1});
+    mediaRecorder = new MediaRecorder(gumStream, {mimeType: 'audio/webm;codecs=opus'});
+    mediaRecorder.start();
 
-	// start the recording process
-	rec.record();
+    mediaRecorder.ondataavailable = function(e) {
+        chunks.push(e.data);
+    }
+
 	console.log("started recording");
 
 	// record button is now a stop button
@@ -137,7 +141,6 @@ function recStart() {
 	recBtn.innerHTML = 'Stop';
 	status_msg.innerHTML = 'Now recording. Press the "Stop" button below to stop recording. The recording will stop automatically after 45 seconds.';
 	document.getElementById("example").className = "hidden";
-
 }
 
 
@@ -154,13 +157,18 @@ function recStopSubmit() {
 	meter.shutdown();
 
 	// stop recording + getUserMedia() stream (mic access)
-	rec.stop();
+	mediaRecorder.stop();
 	gumStream.getAudioTracks()[0].stop();
 
 	console.log("stopped recording.");
 
-	// create wav blob; pass blob to recSubmit() function
-	rec.exportWAV(recSubmit);
+	// wait for the data to be available
+	mediaRecorder.onstop = function() {
+		// create opus blob; pass blob to recSubmit() function
+		var blob = new Blob(chunks, { 'type' : 'audio/opus' });
+		chunks = [];
+		recSubmit(blob);
+	};
 }
 
 
@@ -171,16 +179,8 @@ function recSubmit(blob) {
 
 	var url = URL.createObjectURL(blob);
 
-	// .wav file name (without extension)
-	var filename = new Date().toISOString();
-
-	// create download link
-	/*
-	var link = document.createElement('a');
-	link.href = url;
-	link.download = filename+".wav";
-	link.innerHTML = "Save to disk";
-	*/
+	// .opus file name (without extension)
+	var filename = new Date().toISOString() + '.opus';
 
 	// assemble form data to be submitted to URL upload_link
 	// (upload_link var declared in recorder template)
