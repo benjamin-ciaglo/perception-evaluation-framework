@@ -113,7 +113,7 @@ recBtn.addEventListener("click", recStartStop);
 function recStartStop() {
 	console.log("rec button clicked");
 
-	if (mediaRecorder && mediaRecorder.state === "recording") {
+	if ((typeof rec == 'object') && rec.recording) {
 		// if already recording, stop recording and submit
 		recStopSubmit();
 	} else {
