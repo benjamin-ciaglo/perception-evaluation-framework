@@ -138,7 +138,6 @@ function recStart() {
 	status_msg.innerHTML = 'Now recording. Press the "Stop" button below to stop recording. The recording will stop automatically after 45 seconds.';
 	document.getElementById("example").className = "hidden";
 
-	timer = setTimeout(recStopSubmit, 45000);
 }
 
 
