@@ -30,24 +30,24 @@ def deployHITs(client, preview_url, start_index, end_index, logdir):
     # -------------------------------------------------------------------------------
     TaskAttributes = {
         'MaxAssignments': 27,
-        'LifetimeInSeconds': 30*60*60*24,
-        'AssignmentDurationInSeconds': 10*60,
+        'LifetimeInSeconds': 30 * 60 * 60 * 24,
+        'AssignmentDurationInSeconds': 10 * 60,
         'Reward': '5.00',
         'Title': 'Record yourself describing this week\'s weather',
         'Keywords': 'sound, label, read, record, voice',
         'Description': 'Submit an audio recording of yourself describing this week\'s weather.',
-        'QualificationRequirements': [ # see https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/mturk.html
+        'QualificationRequirements': [
             {
                 'QualificationTypeId': '00000000000000000071',
                 'Comparator': 'EqualTo',
                 'LocaleValues': [{'Country': 'US'}],
-                'ActionsGuarded':"DiscoverPreviewAndAccept"
+                'ActionsGuarded': 'DiscoverPreviewAndAccept'
             },
             {
                 'QualificationTypeId': '000000000000000000L0',
                 'Comparator': 'GreaterThan',
                 'IntegerValues': [90],
-                'ActionsGuarded':"DiscoverPreviewAndAccept"
+                'ActionsGuarded': 'DiscoverPreviewAndAccept'
             }
         ]
     }
