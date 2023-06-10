@@ -228,21 +228,16 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 	print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 	print('\n  workerId:', worker_id, 'validating...')
 
-	# validation 1: transcribe worker-uploaded audio file
+	# validation 1: 
 	filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_worker_recording.wav")
-	try:
-		transcript = scripts.val1(filename)
-	except FileNotFoundError:
-		return redirect('/' + proctor_name + '/' + battery_name + '/record-voice/' + test_idx + '/' + question_idx + '/1' + arg_string)
-	print('    transcript: ' + transcript)
 
 	# validation 1a: count number of words transcribed; accept/reject based on # words threshold
 	# validation 1b: measure length of audio file; accept/reject based on length threshold
 	# output True iff pass val1a and val1b
 	# save in user's specific accept_hit gradesheet
-	test_numwords = scripts.val1a(transcript, 15)
+	#test_numwords = scripts.val1a(transcript, 15)
 	test_soundlength = scripts.val1b(filename, 5)
-	print('    val1a (numwords): ' + str(test_numwords))
+	#print('    val1a (numwords): ' + str(test_numwords))
 	print('    val1b (soundlength): ' + str(test_soundlength))
 	#session[ass_id + "_" + question_idx] = test_numwords & test_soundlength# & (test_wer < 0.2)
 	session[ass_id + "_" + question_idx] = test_soundlength & test_numwords & test_soundlength
