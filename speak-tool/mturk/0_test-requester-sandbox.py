@@ -3,8 +3,8 @@ import boto3
 region = 'us-east-1'
 
 # endpoint of developer environment 
-endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com' # sandbox
-#endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com' # production
+#endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com' # sandbox
+endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com' # production
 
 # read AWS access keys from ~/.aws/credentials
 session = boto3.Session(profile_name = 'mturk-csong23')
