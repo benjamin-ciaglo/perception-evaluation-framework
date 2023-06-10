@@ -96,7 +96,13 @@ def init_test(proctor_name, battery_name, test_idx):
 
 	if (worker_id is not None):
 		worker_already_started_this_task = os.path.exists(os.path.join(save_location, env, worker_id + ".txt"))
+		worker_resuming_task = False
 		if worker_already_started_this_task:
+			with open(os.path.join(save_location, env, worker_id + ".txt"), 'r') as rf:
+				line = rf.readline().strip('\n').split('_')
+				prev_ass_id, prev_hit_id = line[0], line[1]
+				worker_resuming_task = ass_id == prev_ass_id and hit_id == prev_hit_id
+		if worker_already_started_this_task and not worker_resuming_task:
 			return abort(401)
 		else:
 			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
