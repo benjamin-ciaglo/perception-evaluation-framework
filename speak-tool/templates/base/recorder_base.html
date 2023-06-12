@@ -17,8 +17,22 @@
 				{% block task %}{% endblock %}
 			</div>
 		</div>
-		<script type="text/javascript"> var upload_link = "/{{ proctor }}/{{ battery }}/upload-voice/{{ test }}/{{ question }}?assignmentId={{ assignmentId }}&hitId={{ hitId }}&turkSubmitTo={{ turkSubmitTo }}&workerId={{ workerId }}";
-						var next_link = "/{{ proctor }}/{{ battery }}/validate-voice/{{ test }}/{{ question }}?assignmentId={{ assignmentId }}&hitId={{ hitId }}&turkSubmitTo={{ turkSubmitTo }}&workerId={{ workerId }}";</script>
+		<script type="text/javascript">
+			var upload_link = "/{{ proctor }}/{{ battery }}/upload-voice/{{ test }}/{{ question }}?assignmentId={{ assignmentId }}";
+			var next_link = "/{{ proctor }}/{{ battery }}/validate-voice/{{ test }}/{{ question }}?assignmentId={{ assignmentId }}";
+		  
+			if ("{{ hitId }}" !== "") {
+			  upload_link += "&hitId={{ hitId }}";
+			  next_link += "&hitId={{ hitId }}";
+			}
+			if ("{{ turkSubmitTo }}" !== "") {
+			  upload_link += "&turkSubmitTo={{ turkSubmitTo }}";
+			  next_link += "&turkSubmitTo={{ turkSubmitTo }}";
+			}
+		  
+			upload_link += "&workerId={{ workerId }}";
+			next_link += "&workerId={{ workerId }}";
+		</script>
   		<script src="/static/js/third-party/recorder.js" type="text/javascript"></script>
 		<script src="/static/js/third-party/volume-meter/volume-meter.js" type="text/javascript"></script>
   		<script src="/static/js/flask-voice-recorder-app.js"></script>

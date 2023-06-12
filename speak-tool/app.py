@@ -261,8 +261,8 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 			questionIdx1Based=str(int(question_idx)+1),
 			numQuestions=n,
 			assignmentId=ass_id,
-			hitId=hit_id,
-			turkSubmitTo=submit_path,
+			hitId='',
+			turkSubmitTo='',
 			workerId=worker_id,
 		is_not_preview=is_not_preview)
 	else:
