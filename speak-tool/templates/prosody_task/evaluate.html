@@ -15,16 +15,16 @@
 			<audio controls>
 				<source src="{{ audioURL }}" type="audio/mpeg">
 			</audio>
-			<p><b>Question: </b>On a scale of 1 to 7, how friendly does the speaker sound to you?</p>
+			<p><b>Question: </b>On a scale of 1 to 7, how {{ perceptualTrait }} does the speaker sound to you?</p>
 			<form method="POST" action="{{ submitEvaluation }}">
 				<label>
 				<input type="radio" name="option" value="7">
-				7 - Extremely friendly
+				7 - Extremely
 				</label>
 				<br>
 				<label>
 				<input type="radio" name="option" value="6">
-				6 - Moderately friendly
+				6 - Moderately
 				</label>
 				<br>
 				<label>
