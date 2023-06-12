@@ -88,8 +88,8 @@ def pop_sqs_item():
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 0: initialize test
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@app.route('/<proctor_name>/<battery_name>/<test_idx>/<perceptual_trait>')
-def init_test(proctor_name, battery_name, test_idx, perceptual_trait):
+@app.route('/<proctor_name>/<battery_name>/<perceptual_trait>')
+def init_test(proctor_name, battery_name, perceptual_trait):
 	if proctor_name == 'turk':
 		ass_id, hit_id, submit_path, worker_id, arg_string = scripts.get_args()
 
@@ -107,14 +107,14 @@ def init_test(proctor_name, battery_name, test_idx, perceptual_trait):
 			if worker_already_started_this_task and not worker_resuming_task:
 				return abort(401)
 			else:
-				nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
+				nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + '0' + arg_string
 				print('init: ')
 				print('ass_id: ', ass_id, ' hit_id: ', hit_id, ' submit_path: ', ' worker_id: ', worker_id)
 				print('submit_path: ', submit_path, ' arg_string: ', arg_string)
 				session.clear()
 				session[ass_id + "_starttime"] = time.time() # start task timer
 		else:
-			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
+			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + '0' + arg_string
 		return redirect(nextPage)
 	elif proctor_name == 'appen':
 		ass_id, worker_id = str(uuid.uuid4()), str(uuid.uuid4())
