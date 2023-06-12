@@ -527,18 +527,17 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 			pickle.dump(time.time(), file)
 		probably_not_fraud = True if (elapsed_time > 10) else False
 
-		payload = {	'assignmentId':ass_id, 'workerId':worker_id, 'turkSubmitTo':submit_link, 'environment':env,
+		payload = {	'assignmentId':ass_id, 'workerId':worker_id, 'environment':env,
 				'datetime_completed':localtime, 'elapsed_time':elapsed_time, 'probably_not_fraud':str(probably_not_fraud),
 				'worker_ip':worker_ip, 'worker_country':worker_country, 'worker_region':worker_region, 'worker_city':worker_city}
 
 		print('final payload:',payload)
-		submit_link = 'https://www.mturk.com/mturk/externalSubmit' if (env == 'production') else 'https://workersandbox.mturk.com/mturk/externalSubmit'
 
 		session.clear()
 		print('session cleared. ready to submit.')
 		print('  ---- task complete -------------')
 
-		nextPage = submit_link + '?' + urllib.parse.urlencode(payload)
+		nextPage = '/' + proctor_name + '/' + battery_name + '/code/' + '/' + test_idx + '/' + question_idx
 		###
 		return redirect(nextPage)
 	else:
@@ -547,7 +546,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # STEP 6: Display code
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@app.route('/<proctor_name>/<battery_name>/thanks/<test_idx>/<question_idx>', methods=['GET', 'POST'])
+@app.route('/<proctor_name>/<battery_name>/code/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def display_code(proctor_name, battery_name, test_idx, question_idx):
 	if proctor_name == 'appen':
 		ass_id, worker_id, arg_string = scripts.get_args('appen')
