@@ -122,7 +122,7 @@ def init_test(proctor_name, battery_name, perceptual_trait):
 		with open(trait_config_filename, 'w') as trait_handle:
 			trait_handle.write(perceptual_trait)
 		arg_string = '?assignmentId=' + ass_id + '&worker_id=' + worker_id
-		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
+		nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + '1' + arg_string
 		print('init: ')
 		print('ass_id: ', ass_id, ' worker_id: ', worker_id)
 		session.clear()
