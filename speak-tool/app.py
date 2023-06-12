@@ -527,7 +527,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 			pickle.dump(time.time(), file)
 		probably_not_fraud = True if (elapsed_time > 10) else False
 
-		payload = {	'hitId':hit_id, 'assignmentId':ass_id, 'workerId':worker_id, 'turkSubmitTo':submit_link, 'environment':env,
+		payload = {	'assignmentId':ass_id, 'workerId':worker_id, 'turkSubmitTo':submit_link, 'environment':env,
 				'datetime_completed':localtime, 'elapsed_time':elapsed_time, 'probably_not_fraud':str(probably_not_fraud),
 				'worker_ip':worker_ip, 'worker_country':worker_country, 'worker_region':worker_region, 'worker_city':worker_city}
 
