@@ -522,7 +522,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 			worker_city = "N/A"
 
 		elapsed_time = time.time() - session.get(ass_id + "_starttime", 0)
-		pickle_file_path = os.path.join(save_location, env, worker_id + "_" + ass_id + + "_starttime" ".pickle")
+		pickle_file_path = os.path.join(save_location, env, worker_id + "_" + ass_id + "_endtime" ".pickle")
 		with open(pickle_file_path, "wb") as file:
 			pickle.dump(time.time(), file)
 		probably_not_fraud = True if (elapsed_time > 10) else False
