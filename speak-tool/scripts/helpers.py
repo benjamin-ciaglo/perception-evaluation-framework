@@ -46,19 +46,27 @@ def template_picker(battery, test, question, home):
 # submit_path: mturk var "turkSubmitTo"
 # worker_id: mturk var "workerId"
 # arg_string: all mturk vars in a string, readily appendable to the end of a URL
-def get_args():
-	ass_id = request.args.get('assignmentId')
-	hit_id = request.args.get('hitId')
-	submit_path = request.args.get('turkSubmitTo')
-	worker_id = request.args.get('workerId')
+def get_args(proctor_name='turk'):
+	if proctor_name == 'turk':
+		ass_id = request.args.get('assignmentId')
+		hit_id = request.args.get('hitId')
+		submit_path = request.args.get('turkSubmitTo')
+		worker_id = request.args.get('workerId')
 
-	if submit_path is None:
-		if worker_id is None:
-			arg_string = ""
-	else: 
-		arg_string = "?assignmentId=" + ass_id + "&hitId=" + hit_id + "&turkSubmitTo=" + submit_path + "&workerId=" + worker_id
+		if submit_path is None:
+			if worker_id is None:
+				arg_string = ""
+		else: 
+			arg_string = "?assignmentId=" + ass_id + "&hitId=" + hit_id + "&turkSubmitTo=" + submit_path + "&workerId=" + worker_id
 
-	return ass_id, hit_id, submit_path, worker_id, arg_string
+		return ass_id, hit_id, submit_path, worker_id, arg_string
+	elif proctor_name == 'appen':
+		ass_id = request.args.get('assignmentId')
+		worker_id = request.args.get('workerId')
+
+		arg_string = "?assignmentId=" + ass_id + "&workerId=" + worker_id
+
+		return ass_id, hit_id, submit_path, worker_id, arg_string
 
 
 ## print a row of two values neatly

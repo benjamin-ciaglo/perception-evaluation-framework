@@ -156,7 +156,7 @@ def consent(proctor_name, battery_name, test_idx):
 					nextPage=nextPage
 				)
 	elif proctor_name == 'appen':
-		ass_id, worker_id, arg_string = scripts.get_args()
+		ass_id, worker_id, arg_string = scripts.get_args('appen')
 
 		print('consent: ')
 		print('ass_id: ', ass_id, ' worker_id: ', worker_id)
@@ -230,7 +230,7 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 				retrySubmitUrl="/{}/{}/record-voice/{}/{}/{}".format(proctor_name, battery_name,
 								test_idx, question_idx, multiple_attempts_true))
 	elif proctor_name == 'appen':
-		ass_id, worker_id, arg_string = scripts.get_args()
+		ass_id, worker_id, arg_string = scripts.get_args('appen')
 
 		with open(os.path.join(save_location, env, worker_id + ".txt"), 'w') as wf:
 			wf.write(ass_id)
@@ -294,7 +294,7 @@ def upload(proctor_name, battery_name, test_idx, question_idx):
 
 		return ('', 202)
 	elif proctor_name == 'appen':
-		ass_id, worker_id, arg_string = scripts.get_args()
+		ass_id, worker_id, arg_string = scripts.get_args('appen')
 
 		print('upload: ')
 		print('ass_id: ', ass_id, ' worker_id: ', worker_id)
@@ -361,7 +361,7 @@ def validate(proctor_name, battery_name, test_idx, question_idx):
 			print('  workerId:', worker_id, 'redirecting...')
 			return redirect('/' + proctor_name + '/' + battery_name + '/evaluate/' + test_idx + '/' + question_idx + arg_string)
 	elif proctor_name == 'appen':
-		ass_id, worker_id, arg_string = scripts.get_args()
+		ass_id, worker_id, arg_string = scripts.get_args('appen')
 
 		print('validate: ')
 		print('ass_id: ', ass_id, ' worker_id: ', worker_id)
@@ -423,7 +423,7 @@ def evaluate(proctor_name, battery_name, test_idx, question_idx):
 			perceptualTrait=perceptualTrait
 		)
 	elif proctor_name == 'appen':
-		ass_id, worker_id, arg_string = scripts.get_args()
+		ass_id, worker_id, arg_string = scripts.get_args('appen')
 
 		print('evaluate: ')
 		print('ass_id: ', ass_id, ' worker_id: ', worker_id)
@@ -498,7 +498,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 		selected_option = request.form.get('option')
 		print('selected_option: ', selected_option)
 
-		ass_id, worker_id, arg_string = scripts.get_args()
+		ass_id, worker_id, arg_string = scripts.get_args('appen')
 
 		score_file = os.path.join(save_location, env, worker_id + "_" + "score.txt")
 		with open(score_file, 'w') as score_handle:
@@ -550,7 +550,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 @app.route('/<proctor_name>/<battery_name>/thanks/<test_idx>/<question_idx>', methods=['GET', 'POST'])
 def display_code(proctor_name, battery_name, test_idx, question_idx):
 	if proctor_name == 'appen':
-		ass_id, worker_id, arg_string = scripts.get_args()
+		ass_id, worker_id, arg_string = scripts.get_args('appen')
 		code = worker_id + "_" + ass_id
 		return render_template(code_template,
 			code=code
