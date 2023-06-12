@@ -127,7 +127,7 @@ def init_test(proctor_name, battery_name, perceptual_trait):
 		print('ass_id: ', ass_id, ' worker_id: ', worker_id)
 		session.clear()
 		session[ass_id + "_starttime"] = time.time() # start task timer
-		pickle_file_path = os.path.join(save_location, env, worker_id + "_" + ass_id + + "_starttime" ".pickle")
+		pickle_file_path = os.path.join(save_location, env, worker_id + "_" + ass_id + "_starttime" ".pickle")
 		with open(pickle_file_path, "wb") as file:
 			pickle.dump(time.time(), file)
 		return redirect(nextPage)
