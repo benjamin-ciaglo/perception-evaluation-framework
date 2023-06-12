@@ -264,7 +264,7 @@ def record(proctor_name, battery_name, test_idx, question_idx, multiple_attempts
 			hitId='',
 			turkSubmitTo='',
 			workerId=worker_id,
-		is_not_preview=is_not_preview)
+			is_not_preview=True)
 	else:
 		return abort(404)
 
