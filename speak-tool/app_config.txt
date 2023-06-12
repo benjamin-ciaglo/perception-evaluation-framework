@@ -5,6 +5,7 @@ record_template = 'prosody_task/recording_prompt.html'
 thanks_template = 'prosody_task/thanks_turk.html'
 recruitment_and_consent_template = 'prosody_task/recruitment-consent.html'
 evaluation_template = 'prosody_task/evaluate.html'
+code_template = 'prosody_task/code.html'
 
 # where to save all turk worker data
 save_location = '/home/ubuntu/perception-evaluation-framework/speak_amt_prosody'
