@@ -537,7 +537,7 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 		print('session cleared. ready to submit.')
 		print('  ---- task complete -------------')
 
-		nextPage = '/' + proctor_name + '/' + battery_name + '/code/' + '/' + test_idx + '/' + question_idx
+		nextPage = '/' + proctor_name + '/' + battery_name + '/code/' + '/' + test_idx + '/' + question_idx + arg_string
 		###
 		return redirect(nextPage)
 	else:
