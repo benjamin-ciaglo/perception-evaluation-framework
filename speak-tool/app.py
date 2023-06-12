@@ -117,7 +117,7 @@ def init_test(proctor_name, battery_name, test_idx, perceptual_trait):
 			nextPage = '/consent/' + proctor_name + '/' + battery_name + '/' + test_idx + arg_string
 		return redirect(nextPage)
 	elif proctor_name == 'appen':
-		ass_id, worker_id = uuid.uuid4(), uuid.uuid4()
+		ass_id, worker_id = str(uuid.uuid4()), str(uuid.uuid4())
 		trait_config_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_trait_config.txt")
 		with open(trait_config_filename, 'w') as trait_handle:
 			trait_handle.write(perceptual_trait)
