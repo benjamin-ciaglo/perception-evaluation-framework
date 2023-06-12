@@ -34,7 +34,7 @@ def deployHITs(client, preview_url, start_index, end_index, logdir):
         'AssignmentDurationInSeconds': 10 * 60,
         'Reward': '3.34',
         'Title': 'Record yourself describing this week\'s weather',
-        'Keywords': 'sound, label, read, record, voice',
+        'Keywords': 'sound, label, record, voice',
         'Description': 'Submit an audio recording of yourself describing this week\'s weather.',
         'QualificationRequirements': [
             {
