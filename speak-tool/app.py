@@ -557,7 +557,7 @@ def display_code(proctor_name, battery_name, test_idx, question_idx):
 			codes = pickle.load(f)
 		code_displayed_to_worker = codes.pop()
 		code_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_code.txt")
-		with open(code_filename) as wf:
+		with open(code_filename, 'w') as wf:
 			wf.write(code_displayed_to_worker)
 		return render_template(code_template,
 			code=code_displayed_to_worker
