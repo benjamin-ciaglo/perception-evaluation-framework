@@ -551,11 +551,13 @@ def display_code(proctor_name, battery_name, test_idx, question_idx):
 	if proctor_name == 'appen':
 		ass_id, worker_id, arg_string = scripts.get_args('appen')
 		
-		with open('codes.pickle', 'rb') as f:
+		code_pickle = os.path.join(save_location,env,"codes.pickle")
+		with open(code_pickle, 'rb') as f:
 			# Load the set from the file
 			codes = pickle.load(f)
 		code_displayed_to_worker = codes.pop()
-		with open(worker_id + '_' + ass_id + '.txt', 'w') as wf:
+		code_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_code.txt")
+		with open(code_filename) as wf:
 			wf.write(code_displayed_to_worker)
 		return render_template(code_template,
 			code=code_displayed_to_worker
