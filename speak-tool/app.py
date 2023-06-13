@@ -553,7 +553,6 @@ def display_code(proctor_name, battery_name, test_idx, question_idx):
 		
 		code_pickle = os.path.join(save_location,env,"codes.pickle")
 		with open(code_pickle, 'rb') as f:
-			# Load the set from the file
 			codes = pickle.load(f)
 		code1, code2, code3, code4, code5, code6, code7, code8 = codes
 		code_filename = os.path.join(save_location,env,worker_id+"_"+ass_id+"_code.txt")
