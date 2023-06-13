@@ -550,9 +550,15 @@ def complete(proctor_name, battery_name, test_idx, question_idx):
 def display_code(proctor_name, battery_name, test_idx, question_idx):
 	if proctor_name == 'appen':
 		ass_id, worker_id, arg_string = scripts.get_args('appen')
-		code = worker_id + "_" + ass_id
+		
+		with open('codes.pickle', 'rb') as f:
+			# Load the set from the file
+			codes = pickle.load(f)
+		code_displayed_to_worker = codes.pop()
+		with open(worker_id + '_' + ass_id + '.txt', 'w') as wf:
+			wf.write(code_displayed_to_worker)
 		return render_template(code_template,
-			code=code
+			code=code_displayed_to_worker
 		)
 	else:
 		return abort(404)
