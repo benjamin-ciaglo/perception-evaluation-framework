@@ -19,37 +19,37 @@
 			<form method="POST" action="{{ submitEvaluation }}">
 				<label>
 				<input type="radio" name="option" value="7">
-				7 - Extremely
+				7 - Extremely {{ perceptualTrait }}
 				</label>
 				<br>
 				<label>
 				<input type="radio" name="option" value="6">
-				6 - Moderately
+				6 - Moderately {{ perceptualTrait }}
 				</label>
 				<br>
 				<label>
 				<input type="radio" name="option" value="5">
-				5 - Somewhat friendly
+				5 - Somewhat {{ perceptualTrait }}
 				</label>
 				<br>
 				<label>
 				<input type="radio" name="option" value="4">
-				4 - Neither friendly nor unfriendly
+				4 - Neither {{ perceptualTrait }} nor un{{ perceptualTrait }}
 				</label>
 				<br>
 				<label>
 				<input type="radio" name="option" value="3">
-				3 - Somewhat unfriendly
+				3 - Somewhat un{{ perceptualTrait }}
 				</label>
 				<br>
 				<label>
 				<input type="radio" name="option" value="1">
-				2 - Moderately unfriendly
+				2 - Moderately un{{ perceptualTrait }}
 				</label>
 				<br>
 				<label>
 				<input type="radio" name="option" value="1">
-				1 - Extremely unfriendly
+				1 - Extremely un{{ perceptualTrait }}
 				</label>
 				<br>
 				<input type="submit" value="Submit">
